@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "de.gematik.security"
-version = "0.0.1"
+version = "0.1.0"
 application {
     mainClass.set("de.gematik.security.ApplicationKt")
 
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.gematik:credentialExchangeLib:1.0-SNAPSHOT")
+    implementation("de.gematik:credentialExchangeLib:0.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     implementation("com.google.zxing:core:3.5.0")
@@ -33,7 +33,10 @@ dependencies {
     implementation("io.ktor:ktor-server-host-common-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-freemarker-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }

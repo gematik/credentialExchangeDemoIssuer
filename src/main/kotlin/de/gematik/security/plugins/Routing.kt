@@ -1,7 +1,7 @@
 package de.gematik.security.plugins
 
 import de.gematik.security.Customer
-import de.gematik.security.QrCodeInvitation
+import de.gematik.security.Gender
 import de.gematik.security.customers
 import io.ktor.server.application.*
 import io.ktor.server.freemarker.*
@@ -10,17 +10,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 
 fun Application.configureRouting() {
-    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
     routing {
-        staticResources("/static","files")
+        staticResources("/static", "files")
         get("/") {
-            call.respond(FreeMarkerContent("showInvitation.ftl", mapOf("invitation" to QrCodeInvitation)))
+            call.respondRedirect("admin")
         }
         route("admin") {
             get {
@@ -33,15 +30,33 @@ fun Application.configureRouting() {
                 val formParameters = call.receiveParameters()
                 val name = formParameters.getOrFail("name")
                 val givenName = formParameters.getOrFail("givenname")
+                val gender = formParameters.getOrFail("gender")
                 val birthDate = formParameters.getOrFail("birthdate")
                 val email = formParameters.getOrFail("email")
-                val newEntry = Customer(name, givenName, sdf.parse(birthDate), email)
+                val newEntry = Customer(
+                    name,
+                    givenName,
+                    birthDate.toDate(),
+                    if (gender.isBlank()) Gender.Uni else Gender.valueOf(gender),
+                    email
+                )
                 customers.add(newEntry)
                 call.respondRedirect("/admin/${newEntry.id}")
             }
             get("{id}") {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
                 call.respond(FreeMarkerContent("show.ftl", mapOf("customer" to customers.find { it.id == id })))
+            }
+            get("{id}/invitation"){
+                val id = call.parameters.getOrFail<Int>("id").toInt()
+                call.respond(FreeMarkerContent("showInvitation.ftl", mapOf("invitation" to object {
+                    private val customer = customers.find { it.id == id }
+                    val givenName = customer?.givenName
+                    val name = customer?.name
+                    val url = customer?.invitation?.url
+                    val qrCode = customer?.invitation?.qrCode
+                }
+                )))
             }
             get("{id}/edit") {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
@@ -55,11 +70,13 @@ fun Application.configureRouting() {
                         val index = customers.indexOf(customers.find { it.id == id })
                         val name = formParameters.getOrFail("name")
                         val givenName = formParameters.getOrFail("givenname")
+                        val gender = formParameters.getOrFail("gender")
                         val birthDate = formParameters.getOrFail("birthdate")
                         val email = formParameters.get("email")
                         customers[index].name = name
                         customers[index].givenName = givenName
-                        customers[index].birthDate = sdf.parse(birthDate)
+                        customers[index].birthDate = birthDate.toDate()
+                        customers[index].gender = if (gender.isBlank()) Gender.Uni else Gender.valueOf(gender)
                         customers[index].email = email
                         call.respondRedirect("/admin/$id")
                     }

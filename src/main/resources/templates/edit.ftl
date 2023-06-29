@@ -13,6 +13,13 @@
                 <input type="date" name="birthDate" value="${customer.birthDate?date?iso_utc}">
             </p>
             <p>
+                <select name="gender" id="gender">
+                    <option <#if customer.gender == "Female">selected</#if>>Female</option>
+                    <option <#if customer.gender == "Male">selected</#if>>Male</option>
+                    <option <#if customer.gender == "Uni">selected</#if>>Uni</option>
+                </select>
+            </p>
+            <p>
                 <input type="text" name="email" <#if customer.email??>value="${customer.email}"</#if>>
             </p>
             <p>

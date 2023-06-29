@@ -8,6 +8,9 @@
             ${customer.birthDate?date}
         </p>
         <p>
+            ${customer.gender}
+        </p>
+        <p>
             <#if customer.email??>${customer.email}</#if>
         </p>
         <hr>

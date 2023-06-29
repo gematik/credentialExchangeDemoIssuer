@@ -19,6 +19,7 @@
     <h1>Customer Administration </h1>
     <hr>
     <#nested>
+    <hr>
     <a href="/admin">Back to the main page</a>
     </body>
     </html>

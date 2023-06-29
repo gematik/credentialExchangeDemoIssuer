@@ -1,14 +1,13 @@
-<#import "_layout_public.ftl" as layout />
+<#import "_layout.ftl" as layout />
 <@layout.header>
-    <div>
+    <div style="text-align: center;">
         <h3>
-            Invitation
+            Welcome ${invitation.givenName} ${invitation.name}.
         </h3>
-        <p>Click invitation or scan qr-code to request your credential.</p>
-        <p>
-            <a href="${invitation.url}">Invitation</a>
-        </p>
-        <img style='display:block; width:256px; height:256px; margin-left: auto; margin-right: auto' id='base64image' alt="qr-code-invite"
-             src='data:image/jpeg;base64, ${invitation.qrCode}' />
+        <p>Click or scan qr-code to request your credential.</p>
+            <a href="${invitation.url}">
+                <img style='width:256px; height:256px;' id='base64image' alt="qr-code-invite"
+                     src='data:image/jpeg;base64, ${invitation.qrCode}' />
+            </a>
     </div>
 </@layout.header>

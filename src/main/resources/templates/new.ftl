@@ -17,6 +17,16 @@
                     <td style="text-align: left"><input type="date" name="birthdate" id="birthdate"></td>
                 </tr>
                 <tr>
+                    <td style="text-align: right"><label for="gender">gender:</label></td>
+                    <td style="text-align: left">
+                        <select name="gender" id="gender">
+                            <option>Female</option>
+                            <option>Male</option>
+                            <option selected>Uni</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td style="text-align: right"><label for="email">email:</label></td>
                     <td style="text-align: left"><input type="text" name="email" id="email"></td>
                 </tr>
