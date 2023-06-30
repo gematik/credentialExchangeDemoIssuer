@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "de.gematik.security"
-version = "0.1.0"
+version = "0.2.0-SNAPSHOT"
 application {
     mainClass.set("de.gematik.security.ApplicationKt")
 
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.gematik:credentialExchangeLib:0.1.0")
+    implementation("de.gematik:credentialExchangeLib:0.2.0-SNAPSHOT")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
     implementation("com.google.zxing:core:3.5.0")

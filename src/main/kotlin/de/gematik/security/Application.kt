@@ -12,7 +12,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
 fun main() {
-    CredentialExchangeIssuer.listen(WsConnection) {
+    CredentialExchangeIssuerContext.listen(WsConnection) {
         while (true) {
             val message = it.receive()
             if (!Controller.handleIncomingMessage(it, message)) break

@@ -14,7 +14,7 @@ object Controller {
 
     private val logger = KotlinLogging.logger {}
 
-    suspend fun handleIncomingMessage(context: CredentialExchangeIssuer, message: LdObject): Boolean {
+    suspend fun handleIncomingMessage(context: CredentialExchangeIssuerContext, message: LdObject): Boolean {
 
         val type = message.type ?: return true //ignore
         return when {
@@ -25,7 +25,7 @@ object Controller {
         }
     }
 
-    private suspend fun handleInvitation(context: CredentialExchangeIssuer, message: Invitation): Boolean {
+    private suspend fun handleInvitation(context: CredentialExchangeIssuerContext, message: Invitation): Boolean {
         context.sendOffer(
             CredentialOffer(
                 UUID.randomUUID().toString(),
@@ -38,7 +38,7 @@ object Controller {
         return true
     }
 
-    private suspend fun handleCredentialRequest(context: CredentialExchangeIssuer, message: CredentialRequest): Boolean {
+    private suspend fun handleCredentialRequest(context: CredentialExchangeIssuerContext, message: CredentialRequest): Boolean {
         val customer = customers.find { it.invitation.id ==  context.protocolState.invitation?.id} ?: run{
             logger.info { "invalid or expired invitation" }
             return false
