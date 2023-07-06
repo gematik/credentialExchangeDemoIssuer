@@ -1,8 +1,6 @@
 package de.gematik.security.plugins
 
-import de.gematik.security.Customer
-import de.gematik.security.Gender
-import de.gematik.security.customers
+import de.gematik.security.*
 import io.ktor.server.application.*
 import io.ktor.server.freemarker.*
 import io.ktor.server.http.content.*

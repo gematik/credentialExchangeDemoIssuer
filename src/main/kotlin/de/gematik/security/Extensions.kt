@@ -1,4 +1,4 @@
-package de.gematik.security.plugins
+package de.gematik.security
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.client.j2se.MatrixToImageWriter

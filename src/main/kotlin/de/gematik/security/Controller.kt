@@ -3,7 +3,6 @@ package de.gematik.security
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.protocols.*
-import de.gematik.security.plugins.toSimpleString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import mu.KotlinLogging
@@ -14,32 +13,44 @@ object Controller {
 
     private val logger = KotlinLogging.logger {}
 
-    suspend fun handleIncomingMessage(context: CredentialExchangeIssuerContext, message: LdObject): Boolean {
+    suspend fun handleIncomingMessage(protocolInstance: CredentialExchangeIssuerProtocol, message: LdObject): Boolean {
 
         val type = message.type ?: return true //ignore
         return when {
             type.contains("Close") -> false // close connection
-            type.contains("Invitation") -> handleInvitation(context, message as Invitation)
-            type.contains("CredentialRequest") -> handleCredentialRequest(context, message as CredentialRequest)
+            type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
+            type.contains("CredentialRequest") -> handleCredentialRequest(
+                protocolInstance,
+                message as CredentialRequest
+            )
+
             else -> true //ignore
         }
     }
 
-    private suspend fun handleInvitation(context: CredentialExchangeIssuerContext, message: Invitation): Boolean {
-        context.sendOffer(
+    private suspend fun handleInvitation(
+        protocolInstance: CredentialExchangeIssuerProtocol,
+        message: Invitation
+    ): Boolean {
+        protocolInstance.sendOffer(
             CredentialOffer(
                 UUID.randomUUID().toString(),
-                outputDescriptor = Credential(
-                    atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
-                    type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                outputDescriptor = Descriptor(
+                    UUID.randomUUID().toString(), Credential(
+                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                        type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                    )
                 )
             )
         )
         return true
     }
 
-    private suspend fun handleCredentialRequest(context: CredentialExchangeIssuerContext, message: CredentialRequest): Boolean {
-        val customer = customers.find { it.invitation.id ==  context.protocolState.invitation?.id} ?: run{
+    private suspend fun handleCredentialRequest(
+        protocolInstance: CredentialExchangeIssuerProtocol,
+        message: CredentialRequest
+    ): Boolean {
+        val customer = customers.find { it.invitation.id == protocolInstance.protocolState.invitation?.id } ?: run {
             logger.info { "invalid or expired invitation" }
             return false
         }
@@ -88,7 +99,7 @@ object Controller {
                 BbsPlusSigner(credentialIssuer.keyPair)
             )
         }
-        context.submitCredential(
+        protocolInstance.submitCredential(
             CredentialSubmit(
                 UUID.randomUUID().toString(),
                 credential = verifiableCredential
