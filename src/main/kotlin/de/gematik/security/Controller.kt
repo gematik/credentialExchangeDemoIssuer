@@ -69,6 +69,7 @@ object Controller {
                     "order" to JsonPrimitive("3/3"),
                     "recipient" to JsonObject(
                         mapOf(
+                            "id" to JsonPrimitive(message.holderKey),
                             "type" to JsonPrimitive("VaccineRecipient"),
                             "givenName" to JsonPrimitive(customer.givenName),
                             "familyName" to JsonPrimitive(customer.name),
