@@ -9,10 +9,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.imageio.ImageIO
 
-internal val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+private val sdfDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+    timeZone = TimeZone.getTimeZone("UTC")
+}
+private val sdfDateTimeUtc = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US).apply {
+    timeZone = TimeZone.getTimeZone("UTC")
+}
 
-fun String.toDate() = sdf.parse(this)
-fun Date.toSimpleString() = sdf.format(this)
+fun String.toDate() = sdfDate.parse(this)
+fun Date.toDateString() = sdfDate.format(this)
+
+fun String.toDateTimeUtc() = sdfDateTimeUtc.parse(this)
+fun Date.toDateTimeUtcString() = sdfDateTimeUtc.format(this)
 
 val  Invitation.url : String
     get() = "https://my-wallet.me/ssi?oob=${this.toBase64()}"

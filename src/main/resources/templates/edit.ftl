@@ -2,7 +2,7 @@
 <@layout.header>
     <div>
         <h3>Edit customer</h3>
-        <form action="/admin/${customer.id}" method="post">
+        <form action="/admin/${customer.id}/edit" method="post">
             <p>
                 <input type="text" name="name" value="${customer.name}">
             </p>

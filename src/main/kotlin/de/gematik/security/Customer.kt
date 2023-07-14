@@ -12,24 +12,15 @@ enum class Gender {
     Uni
 }
 
-class Customer(
+data class Customer(
     var name: String,
     var givenName: String,
     var birthDate: Date,
     var gender: Gender,
     var email: String? = null,
+    var vaccinations: MutableList<Vaccination> = mutableListOf()
 ) {
     val id = idCounter.getAndIncrement()
-    val invitation = Invitation(
-        UUID.randomUUID().toString(),
-        label = "credential issuer",
-        service = listOf(
-            Service(
-                serviceEndpoint = URI("ws://$localIpAddress:8090/ws")
-            )
-        )
-    )
-
     companion object {
         private val idCounter = AtomicInteger()
     }
@@ -63,6 +54,11 @@ val customers = Collections.synchronizedList(
             birthDate = Calendar.getInstance(Locale.US).apply { set(1934, 10, 13) }.time,
             email = "jr001@gmail.com",
             gender = Gender.Female,
+            vaccinations = mutableListOf(
+                Vaccination(dateOfVaccination = Date(System.currentTimeMillis() - 1000L*60*60*24*360), batchNumber = "1554dfr", vaccine = AuthorizedVaccine.Spikevax, order = 1),
+                Vaccination(dateOfVaccination = Date(System.currentTimeMillis() - 1000L*60*60*24*180), batchNumber = "44c37", vaccine = AuthorizedVaccine.Comirnaty, order = 2),
+                Vaccination(batchNumber = "134acd", vaccine = AuthorizedVaccine.Comirnaty, order = 3)
+            )
         )
     )
 )

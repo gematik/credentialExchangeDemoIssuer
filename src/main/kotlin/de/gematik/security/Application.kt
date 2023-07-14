@@ -10,15 +10,16 @@ import de.gematik.security.plugins.configureTemplating
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import java.net.InetAddress
 
 fun main() {
-    CredentialExchangeIssuerProtocol.listen(WsConnection) {
+    CredentialExchangeIssuerProtocol.listen(WsConnection, host = localIpAddress) {
         while (true) {
             val message = it.receive()
             if (!Controller.handleIncomingMessage(it, message)) break
         }
     }
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+    embeddedServer(Netty, port = 8080, host = localIpAddress, module = Application::module)
         .start(wait = true)
 }
 
@@ -27,7 +28,7 @@ fun Application.module() {
     configureRouting()
 }
 
-val localIpAddress = "172.31.3.94"
+val localIpAddress = InetAddress.getLocalHost().hostAddress
 
 val credentialIssuer = BbsCryptoCredentials(
     KeyPair(

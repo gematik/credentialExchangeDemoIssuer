@@ -2,9 +2,13 @@ package de.gematik.security
 
 import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
+import de.gematik.security.credentialsubjects.Recipient
+import de.gematik.security.credentialsubjects.VaccinationEvent
+import de.gematik.security.credentialsubjects.Vaccine
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.net.URI
 import java.util.*
@@ -12,6 +16,8 @@ import java.util.*
 object Controller {
 
     private val logger = KotlinLogging.logger {}
+
+    private val sixMonth = 1000L * 60 * 60 * 24 * 180
 
     suspend fun handleIncomingMessage(protocolInstance: CredentialExchangeIssuerProtocol, message: LdObject): Boolean {
 
@@ -50,43 +56,38 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
-        val customer = customers.find { it.invitation.id == protocolInstance.protocolState.invitation?.id } ?: run {
-            logger.info { "invalid or expired invitation" }
-            return false
-        }
+        val invitationId = protocolInstance.protocolState.invitation?.id
+        invitationId ?: return false
+        val customer = customers.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null }
+        customer ?: return false
+        val vaccination = customer.vaccinations.firstOrNull { it.invitation.id == invitationId }
+        vaccination ?: return false
         val verifiableCredential = Credential(
             atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
             type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-            credentialSubject = JsonObject(
-                mapOf(
-                    "type" to JsonPrimitive("VaccinationEvent"),
-                    "batchNumber" to JsonPrimitive("1626382736"),
-                    "dateOfVaccination" to JsonPrimitive("2021-06-23T13:40:12Z"),
-                    "administeringCentre" to JsonPrimitive("Praxis Sommergarten"),
-                    "healthProfessional" to JsonPrimitive("883110000015376"),
-                    "countryOfVaccination" to JsonPrimitive("GE"),
-                    "nextVaccinationDate" to JsonPrimitive("2021-08-16T13:40:12Z"),
-                    "order" to JsonPrimitive("3/3"),
-                    "recipient" to JsonObject(
-                        mapOf(
-                            "id" to JsonPrimitive(message.holderKey),
-                            "type" to JsonPrimitive("VaccineRecipient"),
-                            "givenName" to JsonPrimitive(customer.givenName),
-                            "familyName" to JsonPrimitive(customer.name),
-                            "gender" to JsonPrimitive(customer.gender.name),
-                            "birthDate" to JsonPrimitive(customer.birthDate.toSimpleString())
-                        )
+            credentialSubject = json.encodeToJsonElement(
+                VaccinationEvent(
+                    order = "${vaccination.order}/3",
+                    batchNumber = vaccination.batchNumber,
+                    dateOfVaccination = vaccination.dateOfVaccination,
+                    administeringCentre = "Praxis Sommergarten",
+                    healthProfessional = "883110000015376",
+                    countryOfVaccination = "GE",
+                    nextVaccinationDate = Date(vaccination.dateOfVaccination.time + sixMonth),
+                    recipient =  Recipient(
+                        id = URI.create(message.holderKey),
+                        birthDate = customer.birthDate,
+                        familyName = customer.name,
+                        givenName = customer.givenName,
+                        gender = customer.gender.name
                     ),
-                    "vaccine" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("Vaccine"),
-                            "atcCode" to JsonPrimitive("J07BX03"),
-                            "medicinalProductName" to JsonPrimitive("COVID-19 Vaccine Moderna"),
-                            "marketingAuthorizationHolder" to JsonPrimitive("Moderna Biotech")
-                        )
+                    vaccine =  Vaccine(
+                        atcCode = vaccination.atcCode,
+                        medicalProductName = vaccination.vaccine.details.medicalProductName,
+                        marketingAuthorizationHolder = vaccination.vaccine.details.marketingAuthorizationHolder
                     )
                 )
-            ),
+            ).jsonObject,
             issuanceDate = Date(),
             issuer = credentialIssuer.didKey
         ).apply {
