@@ -1,8 +1,8 @@
-<#import "_layout.ftl" as layout />
+<#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
     <div>
         <h3>Add vaccination</h3>
-        <form action="/admin/${data.customer.id}/addVaccination" method="post">
+        <form action="/medicaloffice/${data.customer.id}/addVaccination" method="post">
             <table class="center">
                 <tr>
                     <td style="text-align: right"><label for="dateOfVaccination">date of vaccination:</label></td>

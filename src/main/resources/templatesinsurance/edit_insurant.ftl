@@ -1,8 +1,8 @@
-<#import "_layout.ftl" as layout />
+<#import "_layout_insurance.ftl" as layout />
 <@layout.header>
     <div>
         <h3>Edit customer</h3>
-        <form action="/admin/${customer.id}/edit" method="post">
+        <form action="/insurance/${customer.id}/edit" method="post">
             <p>
                 <input type="text" name="name" value="${customer.name}">
             </p>
@@ -16,7 +16,7 @@
                 <select name="gender" id="gender">
                     <option <#if customer.gender == "Female">selected</#if>>Female</option>
                     <option <#if customer.gender == "Male">selected</#if>>Male</option>
-                    <option <#if customer.gender == "Uni">selected</#if>>Uni</option>
+                    <option <#if customer.gender == "Undefined">selected</#if>>Undefined</option>
                 </select>
             </p>
             <p>
@@ -28,7 +28,7 @@
         </form>
     </div>
     <div>
-        <form action="/admin/${customer.id}" method="post">
+        <form action="/insurance/${customer.id}" method="post">
             <p>
                 <input type="submit" name="_action" value="delete">
             </p>

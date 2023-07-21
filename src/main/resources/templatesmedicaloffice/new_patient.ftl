@@ -1,8 +1,8 @@
-<#import "_layout.ftl" as layout />
+<#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
     <div>
-        <h3>Create customer</h3>
-        <form action="/admin" method="post">
+        <h3>Create patient</h3>
+        <form action="/medicaloffice" method="post">
             <table class="center">
                 <tr>
                     <td style="text-align: right"><label for="name">surname:</label></td>
@@ -22,7 +22,7 @@
                         <select name="gender" id="gender">
                             <option>Female</option>
                             <option>Male</option>
-                            <option selected>Uni</option>
+                            <option selected>Undefined</option>
                         </select>
                     </td>
                 </tr>

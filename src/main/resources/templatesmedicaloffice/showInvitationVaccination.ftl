@@ -1,4 +1,4 @@
-<#import "_layout.ftl" as layout />
+<#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
     <div style="text-align: center;">
         <h3>

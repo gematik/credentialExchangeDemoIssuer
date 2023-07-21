@@ -16,7 +16,7 @@ private val sdfDateTimeUtc = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.U
     timeZone = TimeZone.getTimeZone("UTC")
 }
 
-fun String.toDate() = sdfDate.parse(this)
+fun String.toDate() = runCatching { sdfDate.parse(this) }.getOrDefault( Date(0))
 fun Date.toDateString() = sdfDate.format(this)
 
 fun String.toDateTimeUtc() = sdfDateTimeUtc.parse(this)

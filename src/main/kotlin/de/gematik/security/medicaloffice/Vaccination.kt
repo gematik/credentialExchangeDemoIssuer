@@ -1,8 +1,9 @@
-package de.gematik.security
+package de.gematik.security.medicaloffice
 
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
+import de.gematik.security.localIpAddress
 import kotlinx.serialization.Serializable
 import java.net.URI
 import java.util.*
@@ -81,7 +82,7 @@ data class Vaccination(
         label = "issue vaccination credential",
         service = listOf(
             Service(
-                serviceEndpoint = URI("ws://$localIpAddress:8090/ws")
+                serviceEndpoint = URI("ws://$localIpAddress:${de.gematik.security.medicaloffice.Controller.port}")
             )
         )
     )

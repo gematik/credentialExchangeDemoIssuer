@@ -1,0 +1,37 @@
+<#import "_layout_medicaloffice.ftl" as layout />
+<@layout.header>
+    <div>
+        <h3>Edit patient</h3>
+        <form action="/medicaloffice/${customer.id}/edit" method="post">
+            <p>
+                <input type="text" name="name" value="${customer.name}">
+            </p>
+            <p>
+                <input type="text" name="givenname" value="${customer.givenName}">
+            </p>
+            <p>
+                <input type="date" name="birthDate" value="${customer.birthDate?date?iso_utc}">
+            </p>
+            <p>
+                <select name="gender" id="gender">
+                    <option <#if customer.gender == "Female">selected</#if>>Female</option>
+                    <option <#if customer.gender == "Male">selected</#if>>Male</option>
+                    <option <#if customer.gender == "Undefined">selected</#if>>Undefined</option>
+                </select>
+            </p>
+            <p>
+                <input type="text" name="email" <#if customer.email??>value="${customer.email}"</#if>>
+            </p>
+            <p>
+                <input type="submit" name="_action" value="update">
+            </p>
+        </form>
+    </div>
+    <div>
+        <form action="/medicaloffice/${customer.id}" method="post">
+            <p>
+                <input type="submit" name="_action" value="delete">
+            </p>
+        </form>
+    </div>
+</@layout.header>
