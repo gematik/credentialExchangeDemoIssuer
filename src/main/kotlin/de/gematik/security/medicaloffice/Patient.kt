@@ -52,7 +52,8 @@ val patients = Collections.synchronizedList(
                 costCenter = "Test_GKV-SV GER 109500969",
                 insuranceType = InsuranceType.Member,
                 residencyPrinciple = ResidencyPrinciple.Berlin,
-                start = Utils.getDate(1993, 10, 7)
+                start = Utils.getDate(1993, 10, 7),
+                lastStatusCheck = Date()
             ),
             vaccinations = mutableListOf(
                 Vaccination(

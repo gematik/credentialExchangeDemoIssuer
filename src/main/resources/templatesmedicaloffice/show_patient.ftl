@@ -39,7 +39,10 @@
                     <td>${vaccination.vaccine}</td>
                     <td>${vaccination.batchNumber}</td>
                     <td>${vaccination.order}/3</td>
-                    <td><a href="/medicaloffice/${vaccination.invitation.id}/invitation">${vaccination.invitation.id}</a>
+                    <td><a href="/medicaloffice/${vaccination.invitation.id}/invitation"
+                           target="popup"
+                           onclick="window.open('/medicaloffice/${vaccination.invitation.id}/invitation','popup','width=320,height=520'); return false;"
+                        >${vaccination.invitation.id}</a>
                     </td>
                 </tr>
             </#list>

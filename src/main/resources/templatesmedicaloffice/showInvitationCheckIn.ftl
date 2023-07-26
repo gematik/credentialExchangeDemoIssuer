@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Issue vaccination certificate</title>
+    <title>Check In</title>
 </head>
 <body style="text-align: center; font-family: sans-serif">
-<img src="/static/Vaccination.svg" alt="medical office" width="100">
+<img src="/static/Krankenhaus_Blau_gematik.svg" alt="medical office" width="100">
 <h3>
-    Welcome ${invitation.givenName} ${invitation.name}.
+    Welcome in our office.
 </h3>
-<p>Click or scan qr-code to request your vaccination credential from ${invitation.dateOfVaccination?date}.</p>
+<p>Scan qr-code to check in.</p>
 <a href="${invitation.url}">
     <img style='width:256px; height:256px;' id='base64image' alt="qr-code-invite"
          src='data:image/jpeg;base64, ${invitation.qrCode}'/>

@@ -11,6 +11,7 @@ import de.gematik.security.credentialIssuer
 import de.gematik.security.localIpAddress
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.websocket.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
@@ -26,14 +27,17 @@ object Controller {
 
     val port = 8091
 
+    var lastCallingRemoteAddress : String? = null
+
     fun start(wait : Boolean = false){
         CredentialExchangeIssuerProtocol.listen(WsConnection, host = localIpAddress, port = port) {
+            lastCallingRemoteAddress = ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
             while (true) {
                 val message = it.receive()
                 if (!handleIncomingMessage(it, message)) break
             }
         }
-        embeddedServer(Netty, port = 8080){
+        embeddedServer(Netty, host = localIpAddress, port = 8080){
             configureTemplating()
             configureRouting()
         }.start(wait)
@@ -79,9 +83,9 @@ object Controller {
         val invitationId = protocolInstance.protocolState.invitation?.id?: return false
         val insurant = insurants.find {it.insurance?.invitation?.id == invitationId} ?: return false
         val insurance = insurant.insurance ?: return false
-        val verifiableCredential = getInsurance(insurant, insurance).let {
+        val verifiableCredential = getInsurance(insurant, message.holderKey).let {
             Credential(
-                atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
+                atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
                 credentialSubject = it,
                 issuanceDate = Date(),
@@ -97,7 +101,7 @@ object Controller {
                     BbsPlusSigner(credentialIssuer.keyPair)
                 )
             }
-        }
+        }?: return false
             protocolInstance.submitCredential(
                 CredentialSubmit(
                     UUID.randomUUID().toString(),
@@ -107,7 +111,8 @@ object Controller {
         return false
     }
 
-    private fun getInsurance(insurant: Insurant, insurance: Insurance): JsonObject {
+    private fun getInsurance(insurant: Insurant, holderId: String): JsonObject? {
+        val insurance = insurant.insurance ?: return null
         val streetAddress = insurance.streetAddress.split(' ')
         val costCenter = insurance.costCenter.split(' ')
         return json.encodeToJsonElement(
@@ -136,7 +141,7 @@ object Controller {
                     insuranceType = insurance.insuranceType,
                     residencyPrinciple = insurance.residencyPrinciple
                 )
-            )
+            ).apply { id = URI.create(holderId) }
         ).jsonObject
     }
 

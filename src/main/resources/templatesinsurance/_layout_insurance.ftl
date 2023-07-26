@@ -15,7 +15,7 @@
         </style>
     </head>
     <body style="text-align: center; font-family: sans-serif">
-    <img src="/static/IdentityCard.svg" alt="insurance company">
+    <img src="/static/Krankenkasse_Blau_gematik.svg" alt="insurance company" width="100">
     <h1>Insurance Company</h1>
     <hr>
     <#nested>

@@ -28,7 +28,7 @@
                     <td style="text-align: left"><input type="text" name="batchNumber" id="batchNumber"></td>
                 </tr>
                 <tr>
-                    <td style="text-align: right"><label for="order">gender:</label></td>
+                    <td style="text-align: right"><label for="order">order:</label></td>
                     <td style="text-align: left">
                         <select name="order" id="order">
                             <option>1</option>

@@ -1,12 +1,9 @@
 package de.gematik.security.medicaloffice
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
-import de.gematik.security.insurance.Insurant
-import de.gematik.security.insurance.insurants
-import de.gematik.security.medicaloffice.AuthorizedVaccine
-import de.gematik.security.medicaloffice.Patient
-import de.gematik.security.medicaloffice.Vaccination
-import de.gematik.security.medicaloffice.patients
+import de.gematik.security.credentialExchangeLib.protocols.Invitation
+import de.gematik.security.credentialExchangeLib.protocols.Service
+import de.gematik.security.localIpAddress
 import de.gematik.security.qrCode
 import de.gematik.security.toDate
 import de.gematik.security.url
@@ -17,6 +14,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import java.net.URI
+import java.util.*
 
 
 fun Application.configureRouting() {
@@ -24,7 +23,10 @@ fun Application.configureRouting() {
     routing {
         staticResources("/static", "files")
         get("/") {
-            call.respondRedirect("/static")
+            call.respond(FreeMarkerContent("index.ftl", mapOf("url" to object {
+                val address = localIpAddress
+                val lastCallinRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.insurance.Controller.lastCallingRemoteAddress
+            })))
         }
         route("medicaloffice") {
             get {
@@ -83,7 +85,7 @@ fun Application.configureRouting() {
                     }
 
                     "delete" -> {
-                        insurants.removeIf { it.id == id }
+                        patients.removeIf { it.id == id }
                         call.respondRedirect("/medicaloffice")
                     }
                 }
@@ -91,7 +93,7 @@ fun Application.configureRouting() {
             get("{id}/addVaccination") {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
                 call.respond(FreeMarkerContent("addVaccination.ftl", mapOf("data" to object {
-                    val customer = insurants.find { it.id == id }
+                    val customer = patients.find { it.id == id }
                     val vaccines = AuthorizedVaccine.values().toList()
                 })))
             }
@@ -112,7 +114,8 @@ fun Application.configureRouting() {
             get("{id}/invitation") {
                 val invitationId = call.parameters.getOrFail<String>("id")
                 call.respond(FreeMarkerContent("showInvitationVaccination.ftl", mapOf("invitation" to object {
-                    private val patient = patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null }
+                    private val patient =
+                        patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null }
                     private val vaccination = patient?.vaccinations?.firstOrNull { it.invitation.id == invitationId }
                     val givenName = patient?.givenName
                     val name = patient?.name
@@ -120,6 +123,27 @@ fun Application.configureRouting() {
                     val url = vaccination?.invitation?.url
                     val qrCode = vaccination?.invitation?.qrCode
                 })))
+            }
+            get("/checkin") {
+                call.respond(
+                    FreeMarkerContent(
+                        "showInvitationCheckIn.ftl", mapOf(
+                            "invitation" to object {
+                                private val invitation = Invitation(
+                                    id = UUID.randomUUID().toString(),
+                                    label = "CheckIn",
+                                    service = listOf(
+                                        Service(
+                                            serviceEndpoint = URI("ws://$localIpAddress:${Controller.port}")
+                                        )
+                                    )
+                                )
+                                val url = invitation.url
+                                val qrCode = invitation.qrCode
+                            }
+                        )
+                    )
+                )
             }
         }
     }

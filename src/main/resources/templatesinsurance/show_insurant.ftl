@@ -13,7 +13,10 @@
                 ${customer.insurance.insurantId}<br>
                 ${customer.insurance.insuranceType}<br>
                 coverage since: ${customer.insurance.start?date}<br>
-                <a href="/insurance/${customer.insurance.invitation.id}/invitation">${customer.insurance.invitation.id}</a>
+                <a href="/insurance/${customer.insurance.invitation.id}/invitation"
+                   target="popup"
+                   onclick="window.open('/insurance/${customer.insurance.invitation.id}/invitation','popup','width=320,height=520'); return false;"
+                >${customer.insurance.invitation.id}</a>
             </p>
         <#else>
             <p style="color:red">no active insurance</p>

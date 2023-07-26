@@ -7,6 +7,7 @@
                 <th>birth date</th>
                 <th>gender</th>
                 <th>email</th>
+                <th>insurance check</th>
             </tr>
             <#assign x = 0>
             <#list customers as customer>
@@ -16,11 +17,16 @@
                     <td>${customer.birthDate?date}</td>
                     <td>${customer.gender}</td>
                     <td><#if customer.email??><a href="mailto:${customer.email}">${customer.email}</a></#if></td>
+                    <td><#if customer.insurance??>${customer.insurance.lastStatusCheck?datetime}</#if></td>
                 </tr>
             </#list>
         </table>
     </div>
 <p>
-    <a href="/medicaloffice/new" style="padding: 10px">Create patient</a><br>
+    <a href="/medicaloffice/new" style="padding: 10px">Create patient</a>
+    <a href="/medicaloffice/checkin" style="padding: 10px"
+       target="popup"
+       onclick="window.open('/medicaloffice/checkin','popup','width=320,height=520'); return false;"
+    >Check in with insurance credential</a>
 </p>
 </@layout.header>

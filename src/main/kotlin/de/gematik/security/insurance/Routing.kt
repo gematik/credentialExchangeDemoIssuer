@@ -1,12 +1,7 @@
 package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
-import de.gematik.security.insurance.Insurant
-import de.gematik.security.insurance.insurants
-import de.gematik.security.medicaloffice.AuthorizedVaccine
-import de.gematik.security.medicaloffice.Patient
-import de.gematik.security.medicaloffice.Vaccination
-import de.gematik.security.medicaloffice.patients
+import de.gematik.security.localIpAddress
 import de.gematik.security.qrCode
 import de.gematik.security.toDate
 import de.gematik.security.url
@@ -24,7 +19,10 @@ fun Application.configureRouting() {
     routing {
         staticResources("/static", "files")
         get("/") {
-            call.respondRedirect("/static")
+            call.respond(FreeMarkerContent("index.ftl", mapOf("url" to object {
+                val address = localIpAddress
+                val lastCallingRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.medicaloffice.Controller.lastCallingRemoteAddress
+            })))
         }
         route("insurance") {
             get {

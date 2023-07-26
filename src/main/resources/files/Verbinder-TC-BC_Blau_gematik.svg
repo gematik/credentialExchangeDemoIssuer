@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="12" height="12" version="1.1" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <marker id="Arrow2Send" overflow="visible" orient="auto">
+   <path transform="matrix(-.3 0 0 -.3 .69 0)" d="m8.7186 4.0337-10.926-4.0177 10.926-4.0177c-1.7455 2.3721-1.7354 5.6175 0 8.0354z" fill="#000e52" fill-rule="evenodd" stroke="#000e52" stroke-linejoin="round" stroke-width=".625"/>
+  </marker>
+  <marker id="Arrow2Sstart" overflow="visible" orient="auto">
+   <path transform="matrix(.3 0 0 .3 -.69 0)" d="m8.7186 4.0337-10.926-4.0177 10.926-4.0177c-1.7455 2.3721-1.7354 5.6175 0 8.0354z" fill="#000e52" fill-rule="evenodd" stroke="#000e52" stroke-linejoin="round" stroke-width=".625"/>
+  </marker>
+  <style>.cls-1{fill:#000e52;}</style>
+ </defs>
+ <title>Gematik_PiktogrammeHuerde_Blau Kopie</title>
+ <path d="m6 10v-8" fill="#000e52" marker-end="url(#Arrow2Send)" marker-start="url(#Arrow2Sstart)" stroke="#000e52" stroke-linecap="round" stroke-width=".70711px"/>
+</svg>
