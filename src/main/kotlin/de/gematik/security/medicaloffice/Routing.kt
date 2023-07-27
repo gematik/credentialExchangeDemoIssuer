@@ -26,7 +26,7 @@ fun Application.configureRouting() {
         get("/") {
             call.respond(FreeMarkerContent("index.ftl", mapOf("url" to object {
                 val address = localIpAddress
-                val lastCallinRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.insurance.Controller.lastCallingRemoteAddress
+                val lastCallingRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.insurance.Controller.lastCallingRemoteAddress
             })))
         }
         route("medicaloffice") {
