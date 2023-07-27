@@ -2,6 +2,7 @@ package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.InsuranceType
 import de.gematik.security.credentialExchangeLib.credentialSubjects.ResidencyPrinciple
+import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
@@ -20,7 +21,9 @@ data class Insurance(
     val start: @Serializable(with = DateSerializer::class) Date,
     val invitation: Invitation = Invitation(
         UUID.randomUUID().toString(),
-        label = "issue insurance credential",
+        label = "Health Insurance North",
+        goal = "Issue Insurance Certificates",
+        goalCode = GoalCode.OFFER_CREDENDIAL,
         service = listOf(
             Service(
                 serviceEndpoint = URI("ws://$localIpAddress:${de.gematik.security.insurance.Controller.port}")

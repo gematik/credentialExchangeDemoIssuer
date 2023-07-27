@@ -1,6 +1,7 @@
 package de.gematik.security.medicaloffice
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
+import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.localIpAddress
@@ -131,7 +132,9 @@ fun Application.configureRouting() {
                             "invitation" to object {
                                 private val invitation = Invitation(
                                     id = UUID.randomUUID().toString(),
-                                    label = "CheckIn",
+                                    label = "Praxis Sommergarten",
+                                    goal = "Check In",
+                                    goalCode = GoalCode.REQUEST_PRESENTATION,
                                     service = listOf(
                                         Service(
                                             serviceEndpoint = URI("ws://$localIpAddress:${Controller.port}")

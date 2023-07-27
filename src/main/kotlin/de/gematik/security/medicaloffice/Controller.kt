@@ -42,7 +42,7 @@ object Controller {
                 if (message.type == MessageType.CLOSE) break
                 if (!(message.type == MessageType.INVITATION_ACCEPT)) continue
                 val invitation = json.decodeFromJsonElement<Invitation>(message.content)
-                if (invitation.label == "CheckIn") {
+                if (invitation.goalCode == GoalCode.REQUEST_PRESENTATION) {
                     PresentationExchangeVerifierProtocol.bind(it, invitation) {
                         // request insurance credential
                         if (handleInvitation(it, invitation)) {

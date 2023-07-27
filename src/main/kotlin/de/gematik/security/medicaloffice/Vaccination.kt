@@ -1,5 +1,6 @@
 package de.gematik.security.medicaloffice
 
+import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
@@ -79,7 +80,9 @@ data class Vaccination(
     val order: Int,
     val invitation: Invitation = Invitation(
         UUID.randomUUID().toString(),
-        label = "issue vaccination credential",
+        label = "Praxis Sommergarten",
+        goal = "Issue Vaccination Certificate",
+        goalCode = GoalCode.OFFER_CREDENDIAL,
         service = listOf(
             Service(
                 serviceEndpoint = URI("ws://$localIpAddress:${de.gematik.security.medicaloffice.Controller.port}")
