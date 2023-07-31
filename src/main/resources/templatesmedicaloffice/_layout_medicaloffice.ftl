@@ -18,6 +18,7 @@
     <body style="text-align: center; font-family: sans-serif">
     <img src="/static/Krankenhaus_Blau_gematik.svg" alt="medical office" width="100">
     <h1>Medical Office</h1>
+    <h2>Praxis Sommergarten</h2>
     <hr>
     <#nested>
     <hr>

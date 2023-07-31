@@ -17,6 +17,7 @@
     <body style="text-align: center; font-family: sans-serif">
     <img src="/static/Krankenkasse_Blau_gematik.svg" alt="insurance company" width="100">
     <h1>Insurance Company</h1>
+    <h2>Health Insurance North</h2>
     <hr>
     <#nested>
     <hr>

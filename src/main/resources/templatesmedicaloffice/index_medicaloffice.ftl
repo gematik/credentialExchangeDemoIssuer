@@ -1,6 +1,6 @@
 <#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
-    <div style = "overflow: auto">
+    <div style="overflow: auto">
         <table class="center">
             <tr style="background-color: lightcyan">
                 <th>name</th>
@@ -17,16 +17,20 @@
                     <td>${customer.birthDate?date}</td>
                     <td>${customer.gender}</td>
                     <td><#if customer.email??><a href="mailto:${customer.email}">${customer.email}</a></#if></td>
-                    <td><#if customer.insurance??>${customer.insurance.lastStatusCheck?datetime}</#if></td>
+                    <#if customer.insurance??>
+                        <td>${customer.insurance.lastStatusCheck?datetime}</td>
+                    <#else>
+                        <td style="color:red">no insurance data</td>
+                    </#if>
                 </tr>
             </#list>
         </table>
     </div>
-<p>
-    <a href="/medicaloffice/new" style="padding: 10px">Create patient</a>
-    <a href="/medicaloffice/checkin" style="padding: 10px"
-       target="popup"
-       onclick="window.open('/medicaloffice/checkin','popup','width=320,height=520'); return false;"
-    >Check in with insurance credential</a>
-</p>
+    <p>
+        <a href="/medicaloffice/new" style="padding: 10px">Create patient</a>
+        <a href="/medicaloffice/checkin" style="padding: 10px"
+           target="popup"
+           onclick="window.open('/medicaloffice/checkin','popup','width=320,height=520'); return false;"
+        >Check in with insurance credential</a>
+    </p>
 </@layout.header>
