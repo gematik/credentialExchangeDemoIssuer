@@ -6,12 +6,10 @@ import de.gematik.security.credentialExchangeLib.credentialSubjects.Insurance
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Recipient
 import de.gematik.security.credentialExchangeLib.credentialSubjects.VaccinationEvent
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Vaccine
-import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
-import de.gematik.security.insurance.Controller
 import de.gematik.security.localIpAddress
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -63,7 +61,7 @@ object Controller {
                 break
             }
         }
-        embeddedServer(Netty, host = localIpAddress, port = 8081) {
+        embeddedServer(Netty, host = "0.0.0.0", port = 8081) {
             configureTemplating()
             configureRouting()
         }.start(wait)
@@ -127,7 +125,7 @@ object Controller {
                         proofPurpose = ProofPurpose.ASSERTION_METHOD,
                         verificationMethod = credentialIssuer.verificationMethod
                     ),
-                    BbsPlusSigner(credentialIssuer.keyPair)
+                    credentialIssuer.keyPair.privateKey!!
                 )
             }
         }

@@ -39,9 +39,9 @@
     </tr>
     <tr>
         <td></td>
-        <td><img src="/static/Verbinder-TR-BL_blau_gematik.svg" alt="Verbinder" width="75"></td>
-        <td><img src="/static/Verbinder-TC-BC_blau_gematik.svg" alt="Verbinder" width="75"></td>
-        <td><img src="/static/Verbinder-TL-BR_blau_gematik.svg" alt="Verbinder" width="75"></td>
+        <td><img src="/static/Verbinder-TR-BL_Blau_gematik.svg" alt="Verbinder" width="75"></td>
+        <td><img src="/static/Verbinder-TC-BC_Blau_gematik.svg" alt="Verbinder" width="75"></td>
+        <td><img src="/static/Verbinder-TL-BR_Blau_gematik.svg" alt="Verbinder" width="75"></td>
         <td></td>
     </tr>
     <tr>
@@ -65,7 +65,7 @@
         </td>
         <td></td>
         <td>
-            <img src="/static/Hürde_Blau_gematik.svg" alt="admission control" width="150">
+            <img src="/static/Huerde_Blau_gematik.svg" alt="admission control" width="150">
         </td>
     </tr>
 </table>

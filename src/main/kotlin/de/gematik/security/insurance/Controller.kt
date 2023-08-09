@@ -2,7 +2,6 @@ package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
-import de.gematik.security.credentialExchangeLib.crypto.BbsPlusSigner
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.json
@@ -37,7 +36,7 @@ object Controller {
                 if (!handleIncomingMessage(it, message)) break
             }
         }
-        embeddedServer(Netty, host = localIpAddress, port = 8080){
+        embeddedServer(Netty, host = "0.0.0.0", port = 8080){
             configureTemplating()
             configureRouting()
         }.start(wait)
@@ -98,7 +97,7 @@ object Controller {
                         proofPurpose = ProofPurpose.ASSERTION_METHOD,
                         verificationMethod = credentialIssuer.verificationMethod
                     ),
-                    BbsPlusSigner(credentialIssuer.keyPair)
+                    credentialIssuer.keyPair.privateKey!!
                 )
             }
         }?: return false

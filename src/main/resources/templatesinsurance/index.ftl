@@ -65,7 +65,7 @@
         </td>
         <td></td>
         <td>
-            <img src="/static/Hürde_Blau_gematik.svg" alt="admission control" width="150">
+            <img src="/static/Huerde_Blau_gematik.svg" alt="admission control" width="150">
         </td>
     </tr>
 </table>
