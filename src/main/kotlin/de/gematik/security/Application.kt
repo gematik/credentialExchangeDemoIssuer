@@ -1,7 +1,7 @@
 package de.gematik.security
 
-import de.gematik.security.credentialExchangeLib.crypto.BbsCryptoCredentials
 import de.gematik.security.credentialExchangeLib.crypto.KeyPair
+import de.gematik.security.credentialExchangeLib.crypto.bbs.BbsCryptoCredentials
 import de.gematik.security.credentialExchangeLib.extensions.hexToByteArray
 import java.net.InetAddress
 
