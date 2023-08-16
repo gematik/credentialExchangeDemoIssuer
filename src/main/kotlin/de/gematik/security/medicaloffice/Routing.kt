@@ -1,13 +1,15 @@
 package de.gematik.security.medicaloffice
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
+import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
-import de.gematik.security.localIpAddress
+import de.gematik.security.hostName
 import de.gematik.security.qrCode
 import de.gematik.security.toDate
 import de.gematik.security.url
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.freemarker.*
 import io.ktor.server.http.content.*
@@ -15,6 +17,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import kotlinx.serialization.encodeToString
 import java.net.URI
 import java.util.*
 
@@ -25,13 +28,19 @@ fun Application.configureRouting() {
         staticResources("/static", "files")
         get("/") {
             call.respond(FreeMarkerContent("index.ftl", mapOf("url" to object {
-                val address = localIpAddress
+                val address = hostName
                 val lastCallingRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.insurance.Controller.lastCallingRemoteAddress
             })))
         }
         route("medicaloffice") {
             get {
                 call.respond(FreeMarkerContent("index_medicaloffice.ftl", mapOf("customers" to patients)))
+                patientsDataStatus.update = false
+            }
+            get("update_status") {
+                call.respondText(contentType = ContentType.defaultForFileExtension("json"), HttpStatusCode.OK){
+                    json.encodeToString(patientsDataStatus)
+                }
             }
             get("new") {
                 call.respond(FreeMarkerContent("new_patient.ftl", model = null))
@@ -61,6 +70,7 @@ fun Application.configureRouting() {
                         mapOf("customer" to patients.find { it.id == id })
                     )
                 )
+                patientsDataStatus.update = false
             }
             get("{id}/edit") {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
@@ -137,7 +147,7 @@ fun Application.configureRouting() {
                                     goalCode = GoalCode.REQUEST_PRESENTATION,
                                     service = listOf(
                                         Service(
-                                            serviceEndpoint = URI("ws://$localIpAddress:${Controller.port}")
+                                            serviceEndpoint = URI("ws://$hostName:${Controller.port}")
                                         )
                                     )
                                 )

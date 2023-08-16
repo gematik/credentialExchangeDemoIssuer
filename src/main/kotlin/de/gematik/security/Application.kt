@@ -10,7 +10,9 @@ fun main() {
     de.gematik.security.medicaloffice.Controller.start(wait = true)
 }
 
-val localIpAddress = InetAddress.getLocalHost().hostAddress
+val hostName = InetAddress.getLocalHost().hostName.also {
+    println("host name: $it - home page: http://$it:8080")
+}
 
 val credentialIssuer = BbsCryptoCredentials(
     KeyPair(

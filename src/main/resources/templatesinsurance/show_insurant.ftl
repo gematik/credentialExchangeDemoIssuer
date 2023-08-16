@@ -13,16 +13,16 @@
                 ${customer.insurance.insurantId}<br>
                 ${customer.insurance.insuranceType}<br>
                 coverage since: ${customer.insurance.start?date}<br>
-                <a href="/insurance/${customer.insurance.invitation.id}/invitation"
-                   target="popup"
-                   onclick="window.open('/insurance/${customer.insurance.invitation.id}/invitation','popup','width=320,height=520'); return false;"
-                >${customer.insurance.invitation.id}</a>
             </p>
         <#else>
             <p style="color:red">no active insurance</p>
         </#if>
         <p>
             <a href="/insurance/${customer.id}/edit" style="padding: 10px">Edit profile</a>
+            <a href="/insurance/${customer.insurance.invitation.id}/invitation"
+               target="popup"
+               onclick="window.open('/insurance/${customer.insurance.invitation.id}/invitation','popup','width=320,height=520'); return false;"
+            >Send invitation</a>
         </p>
     </div>
 </@layout.header>

@@ -10,7 +10,6 @@ import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
-import de.gematik.security.localIpAddress
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
@@ -33,7 +32,7 @@ object Controller {
     var lastCallingRemoteAddress : String? = null
 
     fun start(wait: Boolean = false) {
-        WsConnection.listen(host = localIpAddress, port = port) {
+        WsConnection.listen(host = "0.0.0.0", port = port) {
             while (true) {
                 lastCallingRemoteAddress = (it.session as DefaultWebSocketServerSession).call.request.local.remoteAddress
                 val message = it.receive()
@@ -224,6 +223,9 @@ object Controller {
             start = insurance.coverage?.start,
             lastStatusCheck = Date()
         )
+
+        // inform the browser to update the patient page
+        patientsDataStatus.update = true
 
         return false
     }

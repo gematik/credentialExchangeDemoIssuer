@@ -1,5 +1,6 @@
 <#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
+    <script type="text/javascript" src="/static/update_page.js"></script>
     <div>
         <h2>
             ${customer.givenName} ${customer.name} - ${customer.birthDate?date} - ${customer.gender}
@@ -42,7 +43,7 @@
                     <td><a href="/medicaloffice/${vaccination.invitation.id}/invitation"
                            target="popup"
                            onclick="window.open('/medicaloffice/${vaccination.invitation.id}/invitation','popup','width=320,height=520'); return false;"
-                        >${vaccination.invitation.id}</a>
+                        >Send invitation</a>
                     </td>
                 </tr>
             </#list>

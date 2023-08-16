@@ -7,7 +7,6 @@ import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
-import de.gematik.security.localIpAddress
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
@@ -29,7 +28,7 @@ object Controller {
     var lastCallingRemoteAddress : String? = null
 
     fun start(wait : Boolean = false){
-        CredentialExchangeIssuerProtocol.listen(WsConnection, host = localIpAddress, port = port) {
+        CredentialExchangeIssuerProtocol.listen(WsConnection, host = "0.0.0.0", port = port) {
             lastCallingRemoteAddress = ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
             while (true) {
                 val message = it.receive()
@@ -66,7 +65,7 @@ object Controller {
                 UUID.randomUUID().toString(),
                 outputDescriptor = Descriptor(
                     UUID.randomUUID().toString(), Credential(
-                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
+                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
                         type = Credential.DEFAULT_JSONLD_TYPES + "InsuranceCertificate"
                     )
                 )

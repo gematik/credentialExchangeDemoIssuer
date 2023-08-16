@@ -1,5 +1,6 @@
 <#import "_layout_medicaloffice.ftl" as layout />
 <@layout.header>
+    <script type="text/javascript" src="/static/update_page.js"></script>
     <div style="overflow: auto">
         <table class="center">
             <tr style="background-color: lightcyan">

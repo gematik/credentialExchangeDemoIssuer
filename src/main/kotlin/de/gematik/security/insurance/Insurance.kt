@@ -6,7 +6,7 @@ import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
-import de.gematik.security.localIpAddress
+import de.gematik.security.hostName
 import kotlinx.serialization.Serializable
 import java.net.URI
 import java.util.*
@@ -26,7 +26,7 @@ data class Insurance(
         goalCode = GoalCode.OFFER_CREDENDIAL,
         service = listOf(
             Service(
-                serviceEndpoint = URI("ws://$localIpAddress:${de.gematik.security.insurance.Controller.port}")
+                serviceEndpoint = URI("ws://$hostName:${de.gematik.security.insurance.Controller.port}")
             )
         )
     )

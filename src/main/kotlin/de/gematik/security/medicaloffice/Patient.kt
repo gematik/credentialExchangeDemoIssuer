@@ -4,6 +4,9 @@ import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
 import de.gematik.security.credentialExchangeLib.credentialSubjects.InsuranceType
 import de.gematik.security.credentialExchangeLib.credentialSubjects.ResidencyPrinciple
 import de.gematik.security.credentialExchangeLib.extensions.Utils
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -22,6 +25,15 @@ data class Patient(
         private val idCounter = AtomicInteger()
     }
 }
+
+@Serializable
+data class Status (
+    @OptIn(ExperimentalSerializationApi::class)
+    @EncodeDefault
+    var update: Boolean = false
+)
+
+val patientsDataStatus = Status()
 
 val patients = Collections.synchronizedList(
     mutableListOf(

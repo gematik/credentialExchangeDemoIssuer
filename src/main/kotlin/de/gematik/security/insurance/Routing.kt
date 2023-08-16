@@ -1,7 +1,7 @@
 package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
-import de.gematik.security.localIpAddress
+import de.gematik.security.hostName
 import de.gematik.security.qrCode
 import de.gematik.security.toDate
 import de.gematik.security.url
@@ -20,8 +20,10 @@ fun Application.configureRouting() {
         staticResources("/static", "files")
         get("/") {
             call.respond(FreeMarkerContent("index.ftl", mapOf("url" to object {
-                val address = localIpAddress
-                val lastCallingRemoteAddress = Controller.lastCallingRemoteAddress ?: de.gematik.security.medicaloffice.Controller.lastCallingRemoteAddress
+                val address = hostName
+                val lastCallingRemoteAddress = (Controller.lastCallingRemoteAddress ?: de.gematik.security.medicaloffice.Controller.lastCallingRemoteAddress)?.let{
+                    if(it.contains(":")) "[$it]" else it
+                }
             })))
         }
         route("insurance") {
