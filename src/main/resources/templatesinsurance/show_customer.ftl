@@ -10,18 +10,18 @@
         </h3>
         <#if customer.insurance??>
             <p>
-                ${customer.insurance.insurantId}<br>
-                ${customer.insurance.insuranceType}<br>
-                coverage since: ${customer.insurance.start?date}<br>
+                ${customer.insurance.insurant.insurantId}<br>
+                ${customer.insurance.coverage.insuranceType}<br>
+                coverage since: ${customer.insurance.coverage.start?date}<br>
             </p>
         <#else>
             <p style="color:red">no active insurance</p>
         </#if>
         <p>
             <a href="/insurance/${customer.id}/edit" style="padding: 10px">Edit profile</a>
-            <a href="/insurance/${customer.insurance.invitation.id}/invitation"
+            <a href="/insurance/${customer.invitation.id}/invitation"
                target="popup"
-               onclick="window.open('/insurance/${customer.insurance.invitation.id}/invitation','popup','width=320,height=520'); return false;"
+               onclick="window.open('/insurance/${customer.invitation.id}/invitation','popup','width=320,height=520'); return false;"
             >Send invitation</a>
         </p>
     </div>

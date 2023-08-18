@@ -21,6 +21,6 @@
         </table>
     </div>
 <p>
-    <a href="/insurance/new" style="padding: 10px">Create insurant</a><br>
+    <a href="/insurance/new" style="padding: 10px">Create customer</a><br>
 </p>
 </@layout.header>

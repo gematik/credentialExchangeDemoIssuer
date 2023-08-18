@@ -28,10 +28,10 @@ fun Application.configureRouting() {
         }
         route("insurance") {
             get {
-                call.respond(FreeMarkerContent("index_insurance.ftl", mapOf("customers" to insurants)))
+                call.respond(FreeMarkerContent("index_insurance.ftl", mapOf("customers" to customers)))
             }
             get("new") {
-                call.respond(FreeMarkerContent("new_insurant.ftl", model = null))
+                call.respond(FreeMarkerContent("new_customer.ftl", model = null))
             }
             post {
                 val formParameters = call.receiveParameters()
@@ -40,34 +40,34 @@ fun Application.configureRouting() {
                 val gender = formParameters.getOrFail("gender")
                 val birthDate = formParameters.getOrFail("birthdate")
                 val email = formParameters.getOrFail("email")
-                val newEntry = Insurant(
+                val newEntry = Customer(
                     name,
                     givenName,
                     birthDate.toDate(),
                     if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender),
                     email
                 )
-                insurants.add(newEntry)
+                customers.add(newEntry)
                 call.respondRedirect("/insurance/${newEntry.id}")
             }
             get("{id}") {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
                 call.respond(
                     FreeMarkerContent(
-                        "show_insurant.ftl",
-                        mapOf("customer" to insurants.find { it.id == id })
+                        "show_customer.ftl",
+                        mapOf("customer" to customers.find { it.id == id })
                     )
                 )
             }
             get("{id}/invitation") {
                 val invationId = call.parameters.getOrFail<String>("id")
-                insurants.find { it.insurance?.invitation?.id == invationId }?.let { customer ->
+                customers.find { it.invitation.id == invationId }?.let { customer ->
                     call.respond(FreeMarkerContent("showInvitationInsurance.ftl", mapOf("invitation" to object {
                         val givenName = customer.givenName
                         val name = customer.name
-                        val insurantId = customer.insurance?.insurantId
-                        val url = customer.insurance!!.invitation.url
-                        val qrCode = customer.insurance!!.invitation.qrCode
+                        val insurantId = customer.insurance?.insurant?.insurantId
+                        val url = customer.invitation.url
+                        val qrCode = customer.invitation.qrCode
                     })))
                 }
             }
@@ -75,8 +75,8 @@ fun Application.configureRouting() {
                 val id = call.parameters.getOrFail<Int>("id").toInt()
                 call.respond(
                     FreeMarkerContent(
-                        "edit_insurant.ftl",
-                        mapOf("customer" to insurants.find { it.id == id })
+                        "edit_customer.ftl",
+                        mapOf("customer" to customers.find { it.id == id })
                     )
                 )
             }
@@ -85,22 +85,22 @@ fun Application.configureRouting() {
                 val formParameters = call.receiveParameters()
                 when (formParameters.getOrFail("_action")) {
                     "update" -> {
-                        val index = insurants.indexOf(insurants.find { it.id == id })
+                        val index = customers.indexOf(customers.find { it.id == id })
                         val name = formParameters.getOrFail("name")
                         val givenName = formParameters.getOrFail("givenname")
                         val gender = formParameters.getOrFail("gender")
                         val birthDate = formParameters.getOrFail("birthdate")
                         val email = formParameters.get("email")
-                        insurants[index].name = name
-                        insurants[index].givenName = givenName
-                        insurants[index].birthDate = birthDate.toDate()
-                        insurants[index].gender = if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender)
-                        insurants[index].email = email
+                        customers[index].name = name
+                        customers[index].givenName = givenName
+                        customers[index].birthDate = birthDate.toDate()
+                        customers[index].gender = if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender)
+                        customers[index].email = email
                         call.respondRedirect("/insurance/$id")
                     }
 
                     "delete" -> {
-                        insurants.removeIf { it.id == id }
+                        customers.removeIf { it.id == id }
                         call.respondRedirect("/insurance")
                     }
                 }

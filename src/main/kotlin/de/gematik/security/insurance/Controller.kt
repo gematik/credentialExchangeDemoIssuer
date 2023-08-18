@@ -25,17 +25,18 @@ object Controller {
 
     val port = 8091
 
-    var lastCallingRemoteAddress : String? = null
+    var lastCallingRemoteAddress: String? = null
 
-    fun start(wait : Boolean = false){
+    fun start(wait: Boolean = false) {
         CredentialExchangeIssuerProtocol.listen(WsConnection, host = "0.0.0.0", port = port) {
-            lastCallingRemoteAddress = ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
+            lastCallingRemoteAddress =
+                ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
             while (true) {
                 val message = it.receive()
                 if (!handleIncomingMessage(it, message)) break
             }
         }
-        embeddedServer(Netty, host = "0.0.0.0", port = 8080){
+        embeddedServer(Netty, host = "0.0.0.0", port = 8080) {
             configureTemplating()
             configureRouting()
         }.start(wait)
@@ -78,10 +79,9 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
-        val invitationId = protocolInstance.protocolState.invitation?.id?: return false
-        val insurant = insurants.find {it.insurance?.invitation?.id == invitationId} ?: return false
-        val insurance = insurant.insurance ?: return false
-        val verifiableCredential = getInsurance(insurant, message.holderKey).let {
+        val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
+        val insurant = customers.find { it.invitation.id == invitationId } ?: return false
+        val verifiableCredential = getInsurance(insurant, message.holderKey)?.let {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
@@ -99,47 +99,19 @@ object Controller {
                     credentialIssuer.keyPair.privateKey!!
                 )
             }
-        }?: return false
-            protocolInstance.submitCredential(
-                CredentialSubmit(
-                    UUID.randomUUID().toString(),
-                    credential = verifiableCredential
-                )
+        } ?: return false
+        protocolInstance.submitCredential(
+            CredentialSubmit(
+                UUID.randomUUID().toString(),
+                credential = verifiableCredential
             )
+        )
         return false
     }
 
-    private fun getInsurance(insurant: Insurant, holderId: String): JsonObject? {
-        val insurance = insurant.insurance ?: return null
-        val streetAddress = insurance.streetAddress.split(' ')
-        val costCenter = insurance.costCenter.split(' ')
-        return json.encodeToJsonElement(
-            Insurance(
-                insurant = Insurant(
-                    insurantId = insurance.insurantId,
-                    familyName = insurant.name,
-                    givenName = insurant.givenName,
-                    birthdate = insurant.birthDate,
-                    gender = insurant.gender,
-                    streetAddress = StreetAddress(
-                        postalCode = streetAddress[2].toInt(),
-                        location = streetAddress[3],
-                        street = streetAddress[0],
-                        streetNumber = streetAddress[1],
-                        country = streetAddress[4]
-                    )
-                ),
-                coverage = Coverage(
-                    start = Utils.getDate(1993, 10, 7),
-                    costCenter = CostCenter(
-                        name = costCenter[0],
-                        countryCode = costCenter[1],
-                        identification = costCenter[2].toInt()
-                    ),
-                    insuranceType = insurance.insuranceType,
-                    residencyPrinciple = insurance.residencyPrinciple
-                )
-            ).apply { id = URI.create(holderId) }
+    private fun getInsurance(customer: Customer, holderId: String): JsonObject? {
+        val insurance = customer.insurance ?: return null
+        return json.encodeToJsonElement(insurance.apply { id = URI.create(holderId) }
         ).jsonObject
     }
 
