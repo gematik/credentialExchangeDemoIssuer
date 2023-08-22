@@ -67,7 +67,7 @@ fun Application.configureRouting() {
                 call.respond(
                     FreeMarkerContent(
                         "show_patient.ftl",
-                        mapOf("customer" to patients.find { it.id == id })
+                        mapOf("patient" to patients.find { it.id == id })
                     )
                 )
                 patientsDataStatus.update = false

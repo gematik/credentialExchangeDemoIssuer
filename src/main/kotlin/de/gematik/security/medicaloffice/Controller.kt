@@ -29,12 +29,13 @@ object Controller {
 
     val port = 8090
 
-    var lastCallingRemoteAddress : String? = null
+    var lastCallingRemoteAddress: String? = null
 
     fun start(wait: Boolean = false) {
         WsConnection.listen(host = "0.0.0.0", port = port) {
             while (true) {
-                lastCallingRemoteAddress = (it.session as DefaultWebSocketServerSession).call.request.local.remoteAddress
+                lastCallingRemoteAddress =
+                    (it.session as DefaultWebSocketServerSession).call.request.local.remoteAddress
                 val message = it.receive()
                 if (message.type == MessageType.CLOSE) break
                 if (!(message.type == MessageType.INVITATION_ACCEPT)) continue
@@ -153,8 +154,8 @@ object Controller {
                     givenName = patient.givenName,
                     gender = patient.gender.name
                 ).apply {
-                        id = URI.create(message.holderKey)
-                } ,
+                    id = URI.create(message.holderKey)
+                },
                 vaccine = Vaccine(
                     atcCode = vaccination.atcCode,
                     medicalProductName = vaccination.vaccine.details.medicalProductName,
@@ -205,24 +206,28 @@ object Controller {
         val insurance =
             json.decodeFromJsonElement<Insurance>(presentationSubmit.presentation.verifiableCredential.get(0).credentialSubject!!.jsonObject)
         val patient = patients.find {
+            it?.insurance?.insurant?.insurantId == insurance.insurant.insurantId
+        } ?: patients.find {
             (it.name == insurance.insurant.familyName) &&
                     (it.givenName == insurance.insurant.givenName) &&
-                    (it.birthDate == insurance.insurant.birthdate)
-        } ?: return false
+                    (it.birthDate == insurance.insurant.birthDate)
+        }
 
-        patient.insurance = Insurance(
-            insurance.insurant.insurantId,
-            streetAddress = insurance.insurant.streetAddress?.let {
-                "${it.street} ${it.streetNumber} ${it.location} ${it.postalCode} ${it.country}"
-            } ?: "",
-            costCenter = insurance.coverage?.costCenter?.let {
-                "${it.name} ${it.identification} ${it.countryCode}"
-            } ?: "",
-            insuranceType = insurance.coverage?.insuranceType,
-            residencyPrinciple = insurance.coverage?.residencyPrinciple,
-            start = insurance.coverage?.start,
-            lastStatusCheck = Date()
-        )
+        if (patient == null) { // new patient
+            patients.add(
+                Patient(
+                    name = insurance.insurant.familyName,
+                    givenName = insurance.insurant.givenName,
+                    birthDate = insurance.insurant.birthDate,
+                    gender = insurance.insurant.gender,
+                    insurance = insurance,
+                    insuranceLastStatusCheck = Date()
+                )
+            )
+        } else { // update existing patient{
+            patient.insurance = insurance
+            patient.insuranceLastStatusCheck = Date()
+        }
 
         // inform the browser to update the patient page
         patientsDataStatus.update = true

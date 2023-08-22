@@ -56,7 +56,7 @@ val customers = Collections.synchronizedList(
                     insurantId = "X110403567",
                     familyName = "Mustermann",
                     givenName = "Max",
-                    birthdate = Utils.getDate(1965, 5, 4),
+                    birthDate = Utils.getDate(1965, 5, 4),
                     gender = Gender.Male,
                     streetAddress = StreetAddress(
                         10113,
@@ -64,7 +64,14 @@ val customers = Collections.synchronizedList(
                         "Kastanienalle",
                         "231",
                         "GER"
+                    ),
+                    postBoxAddress = PostBoxAddress(
+                        10113,
+                        "Berlin",
+                        "12234",
+                        "GER"
                     )
+
                 ),
                 coverage = Coverage(
                     start = Utils.getDate(2001, 5, 3),
@@ -75,6 +82,26 @@ val customers = Collections.synchronizedList(
                     coPayment = CoPayment(
                         status = true,
                         validUntil = Utils.getDate(2024, 3, 2)
+                    ),
+                    reimbursement = Reimbursement(
+                        medicalCare = true,
+                        dentalCare = true,
+                        inpatientSector = true,
+                        initiatedServices = false
+                    ),
+                    selectiveContracts = SelectiveContracts(
+                        medical = SelectiveContractStatus.available,
+                        dental = SelectiveContractStatus.notUsed,
+                        contractType = ContractType(
+                            generalPractionerCare = true,
+                            structuredTreatmentProgram = false,
+                            integratedCare = false
+                        )
+                    ),
+                    dormantBenefitsEntitlement = DormantBenefitsEntitlement(
+                        start = Utils.getDate(2023, 1, 1),
+                        end = Utils.getDate(2025, 12, 31),
+                        dormancyType = DormancyType.complete
                     )
                 )
             )
@@ -84,7 +111,30 @@ val customers = Collections.synchronizedList(
             "Erika",
             birthDate = Utils.getDate(1967, 11, 25),
             email = "emu@online.de",
-            gender = Gender.Female
+            gender = Gender.Female,
+            insurance = Insurance(
+                insurant = Insurant(
+                    insurantId = "X110403567",
+                    familyName = "Mustermann",
+                    givenName = "Erika",
+                    birthDate = Utils.getDate(1968, 4, 3),
+                    gender = Gender.Female,
+                    streetAddress = StreetAddress(
+                        10112,
+                        "Berlin",
+                        "Max und Moritz Strasse",
+                        "13a",
+                        "GER"
+                    )
+                ),
+                coverage = Coverage(
+                    start = Utils.getDate(2007, 1, 1),
+                    residencyPrinciple = ResidencyPrinciple.Berlin,
+                    insuranceType = InsuranceType.Member,
+                    costCenter = costCenter
+                )
+            )
+
         ),
         Customer(
             "Doe",
@@ -104,8 +154,8 @@ val customers = Collections.synchronizedList(
                     insurantId = "X110403566",
                     familyName = "Roe",
                     givenName = "Jane",
-                    birthdate = Utils.getDate(1934, 10, 13),
-                    gender = Gender.Male,
+                    birthDate = Utils.getDate(1934, 10, 13),
+                    gender = Gender.Female,
                     streetAddress = StreetAddress(
                         10176,
                         "Berlin",

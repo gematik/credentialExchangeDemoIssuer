@@ -1,9 +1,8 @@
 package de.gematik.security.medicaloffice
 
-import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
-import de.gematik.security.credentialExchangeLib.credentialSubjects.InsuranceType
-import de.gematik.security.credentialExchangeLib.credentialSubjects.ResidencyPrinciple
+import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.extensions.Utils
+import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -17,7 +16,8 @@ data class Patient(
     var gender: Gender,
     var email: String? = null,
     var insurance: Insurance? = null,
-    var vaccinations: MutableList<Vaccination> = mutableListOf(),
+    var insuranceLastStatusCheck: @Serializable(with = DateSerializer::class) Date? = null,
+    var vaccinations: MutableList<Vaccination> = mutableListOf()
 ) {
     val id = idCounter.getAndIncrement()
 
@@ -27,7 +27,7 @@ data class Patient(
 }
 
 @Serializable
-data class Status (
+data class Status(
     @OptIn(ExperimentalSerializationApi::class)
     @EncodeDefault
     var update: Boolean = false
@@ -59,14 +59,33 @@ val patients = Collections.synchronizedList(
             email = "jr001@gmail.com",
             gender = Gender.Female,
             insurance = Insurance(
-                insurantId = "X110403566",
-                streetAddress = "Dorfstrasse 1 10176 Berlin GER",
-                costCenter = "Test_GKV-SV GER 109500969",
-                insuranceType = InsuranceType.Member,
-                residencyPrinciple = ResidencyPrinciple.Berlin,
-                start = Utils.getDate(1993, 10, 7),
-                lastStatusCheck = Date()
+                insurant = Insurant(
+                    insurantId = "X110403566",
+                    familyName = "Roe",
+                    givenName = "Jane",
+                    birthDate = Utils.getDate(1934, 10, 13),
+                    gender = Gender.Female,
+                    streetAddress = StreetAddress(
+                        street = "Dorfstrasse",
+                        streetNumber = "1",
+                        location = "Berlin",
+                        postalCode = 10176,
+                        country = "GER"
+                    )
+                ),
+                coverage = Coverage(
+                    insuranceType = InsuranceType.Member,
+                    costCenter = CostCenter(
+                        identification = 109500969,
+                        name = "Test_GKV-SV",
+                        countryCode = "GER"
+                    ),
+                    start = Utils.getDate(1993, 10, 7),
+                    residencyPrinciple = ResidencyPrinciple.Berlin,
+
+                )
             ),
+            insuranceLastStatusCheck = Utils.getDate(2022, 10, 4),
             vaccinations = mutableListOf(
                 Vaccination(
                     dateOfVaccination = Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 360),
