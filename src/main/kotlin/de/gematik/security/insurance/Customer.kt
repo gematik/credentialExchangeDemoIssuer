@@ -1,7 +1,9 @@
 package de.gematik.security.insurance
 
+import de.gematik.security.PreferredContact
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
-import de.gematik.security.credentialExchangeLib.extensions.Utils
+import de.gematik.security.credentialExchangeLib.extensions.getZonedDate
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
@@ -13,9 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger
 data class Customer(
     var name: String,
     var givenName: String,
-    var birthDate: Date,
+    var birthDate: String,
     var gender: Gender,
+    var phone: String? = null,
     var email: String? = null,
+    var preferredContact: PreferredContact = PreferredContact.unknown,
     var insurance: Insurance? = null,
     val invitation: Invitation = Invitation(
         UUID.randomUUID().toString(),
@@ -48,15 +52,17 @@ val customers = Collections.synchronizedList(
         Customer(
             "Mustermann",
             "Max",
-            birthDate = Utils.getDate(1965, 5, 4),
+            birthDate = getZonedDate(1965, 5, 4).toIsoInstantString(),
             gender = Gender.Male,
+            phone = "+49 30 1234234",
             email = "gem.teclab1@gmail.de",
+            preferredContact = PreferredContact.email,
             insurance = Insurance(
                 insurant = Insurant(
                     insurantId = "X110403567",
                     familyName = "Mustermann",
                     givenName = "Max",
-                    birthDate = Utils.getDate(1965, 5, 4),
+                    birthDate = getZonedDate(1965, 5, 4).toIsoInstantString(),
                     gender = Gender.Male,
                     streetAddress = StreetAddress(
                         10113,
@@ -74,14 +80,14 @@ val customers = Collections.synchronizedList(
 
                 ),
                 coverage = Coverage(
-                    start = Utils.getDate(2001, 5, 3),
+                    start = getZonedDate(2001, 5, 3).toIsoInstantString(),
                     residencyPrinciple = ResidencyPrinciple.Berlin,
                     insuranceType = InsuranceType.Member,
                     costCenter = costCenter,
                     dmpMark = DmpMark.CHD_CoronaryHeartDisease,
                     coPayment = CoPayment(
                         status = true,
-                        validUntil = Utils.getDate(2024, 3, 2)
+                        validUntil = getZonedDate(2024, 3, 2).toIsoInstantString()
                     ),
                     reimbursement = Reimbursement(
                         medicalCare = true,
@@ -99,8 +105,8 @@ val customers = Collections.synchronizedList(
                         )
                     ),
                     dormantBenefitsEntitlement = DormantBenefitsEntitlement(
-                        start = Utils.getDate(2023, 1, 1),
-                        end = Utils.getDate(2025, 12, 31),
+                        start = getZonedDate(2023, 1, 1).toIsoInstantString(),
+                        end = getZonedDate(2025, 12, 31).toIsoInstantString(),
                         dormancyType = DormancyType.complete
                     )
                 )
@@ -109,7 +115,7 @@ val customers = Collections.synchronizedList(
         Customer(
             "Mustermann",
             "Erika",
-            birthDate = Utils.getDate(1967, 11, 25),
+            birthDate = getZonedDate(1967, 11, 25).toIsoInstantString(),
             email = "emu@online.de",
             gender = Gender.Female,
             insurance = Insurance(
@@ -117,7 +123,7 @@ val customers = Collections.synchronizedList(
                     insurantId = "X110403567",
                     familyName = "Mustermann",
                     givenName = "Erika",
-                    birthDate = Utils.getDate(1968, 4, 3),
+                    birthDate = getZonedDate(1968, 4, 3).toIsoInstantString(),
                     gender = Gender.Female,
                     streetAddress = StreetAddress(
                         10112,
@@ -128,7 +134,7 @@ val customers = Collections.synchronizedList(
                     )
                 ),
                 coverage = Coverage(
-                    start = Utils.getDate(2007, 1, 1),
+                    start = getZonedDate(2007, 1, 1).toIsoInstantString(),
                     residencyPrinciple = ResidencyPrinciple.Berlin,
                     insuranceType = InsuranceType.Member,
                     costCenter = costCenter
@@ -139,14 +145,14 @@ val customers = Collections.synchronizedList(
         Customer(
             "Doe",
             "John",
-            birthDate = Utils.getDate(1935, 6, 22),
+            birthDate = getZonedDate(1935, 6, 22).toIsoInstantString(),
             email = "john.doe@aol.com",
             gender = Gender.Male
         ),
         Customer(
             "Roe",
             "Jane",
-            birthDate = Utils.getDate(1934, 10, 13),
+            birthDate = getZonedDate(1934, 10, 13).toIsoInstantString(),
             email = "jr001@gmail.com",
             gender = Gender.Female,
             insurance = Insurance(
@@ -154,7 +160,7 @@ val customers = Collections.synchronizedList(
                     insurantId = "X110403566",
                     familyName = "Roe",
                     givenName = "Jane",
-                    birthDate = Utils.getDate(1934, 10, 13),
+                    birthDate = getZonedDate(1934, 10, 13).toIsoInstantString(),
                     gender = Gender.Female,
                     streetAddress = StreetAddress(
                         10176,
@@ -165,7 +171,7 @@ val customers = Collections.synchronizedList(
                     )
                 ),
                 coverage = Coverage(
-                    start = Utils.getDate(1993, 10, 7),
+                    start = getZonedDate(1993, 10, 7).toIsoInstantString(),
                     residencyPrinciple = ResidencyPrinciple.Berlin,
                     insuranceType = InsuranceType.Member,
                     costCenter = costCenter,

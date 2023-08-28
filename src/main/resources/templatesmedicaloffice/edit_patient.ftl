@@ -10,7 +10,7 @@
                 <input type="text" name="givenname" value="${customer.givenName}">
             </p>
             <p>
-                <input type="date" name="birthDate" value="${customer.birthDate?date?iso_utc}">
+                <input type="date" name="birthDate" value="${customer.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")?iso_utc}">
             </p>
             <p>
                 <select name="gender" id="gender">

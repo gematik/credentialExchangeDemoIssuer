@@ -6,7 +6,9 @@
             <table class="center">
                 <tr>
                     <td style="text-align: right"><label for="dateOfVaccination">date of vaccination:</label></td>
-                    <td style="text-align: left"><input type="date" name="dateOfVaccination" id="dateOfVaccination">
+                    <td style="text-align: left">
+                    <#assign now=.now>
+                    <input type="date" name="dateOfVaccination" id="dateOfVaccination" value="${now?date?iso_utc}">
                     </td>
                 </tr>
                 <tr>

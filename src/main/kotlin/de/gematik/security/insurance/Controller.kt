@@ -1,9 +1,7 @@
 package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.connection.WsConnection
-import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
-import de.gematik.security.credentialExchangeLib.extensions.Utils
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
@@ -15,6 +13,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.net.URI
+import java.time.ZonedDateTime
 import java.util.*
 
 object Controller {
@@ -81,18 +80,18 @@ object Controller {
     ): Boolean {
         val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
         val insurant = customers.find { it.invitation.id == invitationId } ?: return false
-        val verifiableCredential = getInsurance(insurant, message.holderKey)?.let {
+        val verifiableCredential = getInsurance(insurant, message.holderKey.toString())?.let {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
                 credentialSubject = it,
-                issuanceDate = Date(),
+                issuanceDate = ZonedDateTime.now(),
                 issuer = credentialIssuer.didKey
             ).apply {
                 sign(
                     LdProof(
                         type = listOf(ProofType.BbsBlsSignature2020.name),
-                        created = Date(),
+                        created = ZonedDateTime.now(),
                         proofPurpose = ProofPurpose.ASSERTION_METHOD,
                         verificationMethod = credentialIssuer.verificationMethod
                     ),
@@ -111,7 +110,7 @@ object Controller {
 
     private fun getInsurance(customer: Customer, holderId: String): JsonObject? {
         val insurance = customer.insurance ?: return null
-        return json.encodeToJsonElement(insurance.apply { id = URI.create(holderId) }
+        return json.encodeToJsonElement(insurance.apply { id = holderId }
         ).jsonObject
     }
 

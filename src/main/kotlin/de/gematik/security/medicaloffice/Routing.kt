@@ -1,13 +1,13 @@
 package de.gematik.security.medicaloffice
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.hostName
 import de.gematik.security.qrCode
-import de.gematik.security.toDate
 import de.gematik.security.url
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -19,6 +19,10 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import kotlinx.serialization.encodeToString
 import java.net.URI
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -55,7 +59,10 @@ fun Application.configureRouting() {
                 val newEntry = Patient(
                     name,
                     givenName,
-                    birthDate.toDate(),
+                    LocalDate.parse(birthDate, DateTimeFormatter.ISO_DATE)
+                        .atTime(12,0)
+                        .atZone(ZoneId.of("UTC"))
+                        .toIsoInstantString(),
                     if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender),
                     email
                 )
@@ -89,7 +96,10 @@ fun Application.configureRouting() {
                         val email = formParameters.get("email")
                         patients[index].name = name
                         patients[index].givenName = givenName
-                        patients[index].birthDate = birthDate.toDate()
+                        patients[index].birthDate = LocalDate.parse(birthDate, DateTimeFormatter.ISO_DATE)
+                            .atTime(12,0)
+                            .atZone(ZoneId.of("UTC"))
+                            .toIsoInstantString()
                         patients[index].gender = if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender)
                         patients[index].email = email
                         call.respondRedirect("/medicaloffice/$id")
@@ -113,7 +123,16 @@ fun Application.configureRouting() {
                 val formParameters = call.receiveParameters()
                 val index = patients.indexOf(patients.find { it.id == id })
                 val vaccination = Vaccination(
-                    dateOfVaccination = formParameters.getOrFail("dateOfVaccination").toDate(),
+                    dateOfVaccination = formParameters.getOrFail("dateOfVaccination").let {
+                        if (it.isBlank()) {
+                            ZonedDateTime.now().toIsoInstantString()
+                        } else {
+                            LocalDate.parse(it, DateTimeFormatter.ISO_DATE)
+                                .atTime(12,0)
+                                .atZone(ZoneId.of("UTC"))
+                                .toIsoInstantString()
+                        }
+                    },
                     atcCode = formParameters.getOrFail("atcCode"),
                     vaccine = AuthorizedVaccine.valueOf(formParameters.getOrFail("vaccine")),
                     batchNumber = formParameters.getOrFail("batchNumber"),

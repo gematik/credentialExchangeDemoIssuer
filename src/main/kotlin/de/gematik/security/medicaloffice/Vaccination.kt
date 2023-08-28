@@ -1,12 +1,13 @@
 package de.gematik.security.medicaloffice
 
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
 import de.gematik.security.credentialExchangeLib.protocols.Invitation
 import de.gematik.security.credentialExchangeLib.protocols.Service
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
 import de.gematik.security.hostName
 import kotlinx.serialization.Serializable
 import java.net.URI
+import java.time.ZonedDateTime
 import java.util.*
 
 @Serializable
@@ -73,7 +74,7 @@ enum class AuthorizedVaccine(val details: VaccineDetails) {
 
 @Serializable
 data class Vaccination(
-    val dateOfVaccination: @Serializable(with = DateSerializer::class) Date = Date(),
+    val dateOfVaccination: String = ZonedDateTime.now().toIsoInstantString(),
     val atcCode: String = "J07BX03",
     val vaccine: AuthorizedVaccine,
     val batchNumber: String,

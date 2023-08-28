@@ -2,7 +2,7 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Medical Office</title>
+        <title>Praxis Sommergarten</title>
         <style>
             table.center {
                 margin-left: auto;
@@ -17,7 +17,6 @@
     </head>
     <body style="text-align: center; font-family: sans-serif">
     <img src="/static/Krankenhaus_Blau_gematik.svg" alt="medical office" width="100">
-    <h1>Medical Office</h1>
     <h2>Praxis Sommergarten</h2>
     <hr>
     <#nested>

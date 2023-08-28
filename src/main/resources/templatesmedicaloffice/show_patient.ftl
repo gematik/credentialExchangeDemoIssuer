@@ -2,10 +2,29 @@
 <@layout.header>
     <script type="text/javascript" src="/static/update_page.js"></script>
     <div>
-        <h2>
-            ${patient.givenName} ${patient.name} - ${patient.birthDate?date} - ${patient.gender}
-            - <#if patient.email??>${patient.email}</#if>
-        </h2>
+        <h3>
+            Patient
+        </h3>
+        <table class="center">
+            <tr style="background-color: lightcyan; font-size: xx-small">
+                <th>family name</th>
+                <th>given name</th>
+                <th>birth date</th>
+                <th>gender</th>
+                <th>phone</th>
+                <th>email</th>
+                <th>preferred contact</th>
+            </tr>
+            <tr>
+                <td>${patient.name}</td>
+                <td>${patient.givenName}</td>
+                <td>${patient.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
+                <td>${patient.gender}</td>
+                <td>${patient.phone!"---"}</td>
+                <td>${patient.email!"---"}</td>
+                <td>${patient.preferredContact}</td>
+            </tr>
+        </table>
         <h3>
             Insurance
         </h3>
@@ -29,7 +48,7 @@
                     <td>${patient.insurance.insurant.givenName}</td>
                     <td>${patient.insurance.insurant.nameExtension!"---"}</td>
                     <td>${patient.insurance.insurant.academicTitle!"---"}</td>
-                    <td>${patient.insurance.insurant.birthDate?date}</td>
+                    <td>${patient.insurance.insurant.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>${patient.insurance.insurant.gender}</td>
                 </tr>
                 <#if patient.insurance.insurant.streetAddress??>
@@ -91,10 +110,10 @@
                     <th>disease management plan</th>
                 </tr>
                 <tr>
-                    <td>${patient.insurance.coverage.start?date}</td>
+                    <td>${patient.insurance.coverage.start?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>
                         <#if patient.insurance.coverage.end??>
-                            ${patient.insurance.coverage.end?date}
+                            ${patient.insurance.coverage.end?date("yyyy-MM-dd'T'hh:mm:ssX")}
                         <#else>
                             --.--.----
                         </#if>
@@ -169,14 +188,14 @@
                     <td>${patient.insurance.coverage.coPayment.status?string('yes', 'no')}</td>
                     <td>
                         <#if patient.insurance.coverage.coPayment.validUntil??>
-                            ${patient.insurance.coverage.coPayment.validUntil?date}
+                            ${patient.insurance.coverage.coPayment.validUntil?date("yyyy-MM-dd'T'hh:mm:ssX")}
                         <#else>
                             --.--.----
                         </#if>
                     </td>
                     <#if patient.insurance.coverage.dormantBenefitsEntitlement??>
-                        <td>${patient.insurance.coverage.dormantBenefitsEntitlement.start?date}</td>
-                        <td>${patient.insurance.coverage.dormantBenefitsEntitlement.end?date}</td>
+                        <td>${patient.insurance.coverage.dormantBenefitsEntitlement.start?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
+                        <td>${patient.insurance.coverage.dormantBenefitsEntitlement.end?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                         <td>${patient.insurance.coverage.dormantBenefitsEntitlement.dormancyType}</td>
                     <#else>
                         <td>--.--.----</td>
@@ -204,7 +223,7 @@
             <#list patient.vaccinations?reverse as vaccination>
                 <#assign x++>
                 <tr <#if  x%2 = 0>style="background-color: lightcyan"</#if> >
-                    <td>${vaccination.dateOfVaccination?date}</td>
+                    <td>${vaccination.dateOfVaccination?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>${vaccination.atcCode}</td>
                     <td>${vaccination.vaccine}</td>
                     <td>${vaccination.batchNumber}</td>
@@ -222,6 +241,10 @@
         <p>
             <a href="/medicaloffice/${patient.id}/edit" style="padding: 10px">Edit profile</a>
             <a href="/medicaloffice/${patient.id}/addVaccination" style="padding: 10px">Add vaccination</a>
+            <a href="/medicaloffice/checkin" style="padding: 10px"
+               target="popup"
+               onclick="window.open('/medicaloffice/checkin','popup','width=320,height=520'); return false;"
+            >Check in with insurance credential</a>
         </p>
     </div>
 </@layout.header>

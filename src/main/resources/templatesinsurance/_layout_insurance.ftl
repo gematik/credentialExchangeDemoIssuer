@@ -2,7 +2,7 @@
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Insurance Company</title>
+        <title>Health Insurance North</title>
         <style>
              table.center {
                 margin-left: auto;
@@ -16,8 +16,7 @@
     </head>
     <body style="text-align: center; font-family: sans-serif">
     <img src="/static/Krankenkasse_Blau_gematik.svg" alt="insurance company" width="100">
-    <h1>Insurance Company</h1>
-    <h2>Health Insurance North</h2>
+    <h1>Health Insurance North</h1>
     <hr>
     <#nested>
     <hr>

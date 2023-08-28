@@ -1,22 +1,26 @@
 package de.gematik.security.medicaloffice
 
+import de.gematik.security.PreferredContact
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
-import de.gematik.security.credentialExchangeLib.extensions.Utils
-import de.gematik.security.credentialExchangeLib.serializer.DateSerializer
+import de.gematik.security.credentialExchangeLib.extensions.getZonedDate
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 data class Patient(
     var name: String,
     var givenName: String,
-    var birthDate: Date,
+    var birthDate: String,
     var gender: Gender,
+    var phone: String? = null,
     var email: String? = null,
+    var preferredContact : PreferredContact = PreferredContact.unknown,
     var insurance: Insurance? = null,
-    var insuranceLastStatusCheck: @Serializable(with = DateSerializer::class) Date? = null,
+    var insuranceLastStatusCheck: String? = null,
     var vaccinations: MutableList<Vaccination> = mutableListOf()
 ) {
     val id = idCounter.getAndIncrement()
@@ -40,12 +44,12 @@ val patients = Collections.synchronizedList(
         Patient(
             "Mustermann",
             "Max",
-            birthDate = Utils.getDate(1965, 5, 4),
+            birthDate = getZonedDate(1965, 5, 4).toIsoInstantString(),
             gender = Gender.Male,
             email = "gem.teclab1@gmail.de",
             vaccinations = mutableListOf(
                 Vaccination(
-                    dateOfVaccination = Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 360),
+                    dateOfVaccination = ZonedDateTime.now().minusYears(1).toIsoInstantString(),
                     batchNumber = "65493",
                     vaccine = AuthorizedVaccine.Spikevax,
                     order = 1
@@ -55,7 +59,7 @@ val patients = Collections.synchronizedList(
         Patient(
             "Roe",
             "Jane",
-            birthDate = Calendar.getInstance(Locale.US).apply { set(1934, 10, 13) }.time,
+            birthDate = getZonedDate(1934, 10, 13).toIsoInstantString(),
             email = "jr001@gmail.com",
             gender = Gender.Female,
             insurance = Insurance(
@@ -63,7 +67,7 @@ val patients = Collections.synchronizedList(
                     insurantId = "X110403566",
                     familyName = "Roe",
                     givenName = "Jane",
-                    birthDate = Utils.getDate(1934, 10, 13),
+                    birthDate = getZonedDate(1934, 10, 13).toIsoInstantString(),
                     gender = Gender.Female,
                     streetAddress = StreetAddress(
                         street = "Dorfstrasse",
@@ -80,21 +84,21 @@ val patients = Collections.synchronizedList(
                         name = "Test_GKV-SV",
                         countryCode = "GER"
                     ),
-                    start = Utils.getDate(1993, 10, 7),
+                    start = getZonedDate(1993, 10, 7).toIsoInstantString(),
                     residencyPrinciple = ResidencyPrinciple.Berlin,
 
                 )
             ),
-            insuranceLastStatusCheck = Utils.getDate(2022, 10, 4),
+            insuranceLastStatusCheck = getZonedDate(2022, 10, 4).toIsoInstantString(),
             vaccinations = mutableListOf(
                 Vaccination(
-                    dateOfVaccination = Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 360),
+                    dateOfVaccination = ZonedDateTime.now().minusYears(1).toIsoInstantString(),
                     batchNumber = "1554dfr",
                     vaccine = AuthorizedVaccine.Spikevax,
                     order = 1
                 ),
                 Vaccination(
-                    dateOfVaccination = Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 180),
+                    dateOfVaccination = ZonedDateTime.now().minusMonths(6).toIsoInstantString(),
                     batchNumber = "44c37",
                     vaccine = AuthorizedVaccine.Comirnaty,
                     order = 2

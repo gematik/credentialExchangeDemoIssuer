@@ -1,10 +1,29 @@
 <#import "_layout_insurance.ftl" as layout />
 <@layout.header>
     <div>
-        <h2>
-            ${customer.givenName} ${customer.name} - ${customer.birthDate?date} - ${customer.gender}
-            - <#if customer.email??>${customer.email}</#if>
-        </h2>
+        <h3>
+            Customer
+        </h3>
+        <table class="center">
+            <tr style="background-color: lightcyan; font-size: xx-small">
+                <th>family name</th>
+                <th>given name</th>
+                <th>birth date</th>
+                <th>gender</th>
+                <th>phone</th>
+                <th>email</th>
+                <th>preferred contact</th>
+            </tr>
+            <tr>
+                <td>${customer.name}</td>
+                <td>${customer.givenName}</td>
+                <td>${customer.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
+                <td>${customer.gender}</td>
+                <td>${customer.phone!"---"}</td>
+                <td>${customer.email!"---"}</td>
+                <td>${customer.preferredContact}</td>
+            </tr>
+        </table>
         <h3>
             Insurance
         </h3>
@@ -28,7 +47,7 @@
                     <td>${customer.insurance.insurant.givenName}</td>
                     <td>${customer.insurance.insurant.nameExtension!"---"}</td>
                     <td>${customer.insurance.insurant.academicTitle!"---"}</td>
-                    <td>${customer.insurance.insurant.birthDate?date}</td>
+                    <td>${customer.insurance.insurant.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>${customer.insurance.insurant.gender}</td>
                 </tr>
                 <#if customer.insurance.insurant.streetAddress??>
@@ -75,10 +94,10 @@
                     <th>disease management plan</th>
                 </tr>
                 <tr>
-                    <td>${customer.insurance.coverage.start?date}</td>
+                    <td>${customer.insurance.coverage.start?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>
                         <#if customer.insurance.coverage.end??>
-                            ${customer.insurance.coverage.end?date}
+                            ${customer.insurance.coverage.end?date("yyyy-MM-dd'T'hh:mm:ssX")}
                         <#else>
                             --.--.----
                         </#if>
@@ -153,14 +172,14 @@
                     <td>${customer.insurance.coverage.coPayment.status?string('yes', 'no')}</td>
                     <td>
                         <#if customer.insurance.coverage.coPayment.validUntil??>
-                            ${customer.insurance.coverage.coPayment.validUntil?date}
+                            ${customer.insurance.coverage.coPayment.validUntil?date("yyyy-MM-dd'T'hh:mm:ssX")}
                         <#else>
                             --.--.----
                         </#if>
                     </td>
                     <#if customer.insurance.coverage.dormantBenefitsEntitlement??>
-                        <td>${customer.insurance.coverage.dormantBenefitsEntitlement.start?date}</td>
-                        <td>${customer.insurance.coverage.dormantBenefitsEntitlement.end?date}</td>
+                        <td>${customer.insurance.coverage.dormantBenefitsEntitlement.start?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
+                        <td>${customer.insurance.coverage.dormantBenefitsEntitlement.end?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                         <td>${customer.insurance.coverage.dormantBenefitsEntitlement.dormancyType}</td>
                     <#else>
                         <td>--.--.----</td>

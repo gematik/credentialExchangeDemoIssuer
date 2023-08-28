@@ -1,9 +1,9 @@
 package de.gematik.security.insurance
 
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.hostName
 import de.gematik.security.qrCode
-import de.gematik.security.toDate
 import de.gematik.security.url
 import io.ktor.server.application.*
 import io.ktor.server.freemarker.*
@@ -12,6 +12,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 fun Application.configureRouting() {
@@ -43,7 +46,10 @@ fun Application.configureRouting() {
                 val newEntry = Customer(
                     name,
                     givenName,
-                    birthDate.toDate(),
+                    LocalDate.parse(birthDate, DateTimeFormatter.ISO_DATE)
+                        .atTime(12,0)
+                        .atZone(ZoneId.of("UTC"))
+                        .toIsoInstantString(),
                     if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender),
                     email
                 )
@@ -93,7 +99,10 @@ fun Application.configureRouting() {
                         val email = formParameters.get("email")
                         customers[index].name = name
                         customers[index].givenName = givenName
-                        customers[index].birthDate = birthDate.toDate()
+                        customers[index].birthDate = LocalDate.parse(birthDate, DateTimeFormatter.ISO_DATE)
+                            .atTime(12,0)
+                            .atZone(ZoneId.of("UTC"))
+                            .toIsoInstantString()
                         customers[index].gender = if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender)
                         customers[index].email = email
                         call.respondRedirect("/insurance/$id")

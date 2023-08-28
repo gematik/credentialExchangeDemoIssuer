@@ -7,18 +7,18 @@ import de.gematik.security.credentialExchangeLib.credentialSubjects.Recipient
 import de.gematik.security.credentialExchangeLib.credentialSubjects.VaccinationEvent
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Vaccine
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
+import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.*
 import mu.KotlinLogging
 import java.net.URI
+import java.time.ZonedDateTime
 import java.util.*
 
 object Controller {
@@ -115,13 +115,13 @@ object Controller {
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
                 credentialSubject = it,
-                issuanceDate = Date(),
+                issuanceDate = ZonedDateTime.now(),
                 issuer = credentialIssuer.didKey
             ).apply {
                 sign(
                     LdProof(
                         type = listOf(ProofType.BbsBlsSignature2020.name),
-                        created = Date(),
+                        created = ZonedDateTime.now(),
                         proofPurpose = ProofPurpose.ASSERTION_METHOD,
                         verificationMethod = credentialIssuer.verificationMethod
                     ),
@@ -147,14 +147,15 @@ object Controller {
                 administeringCentre = "Praxis Sommergarten",
                 healthProfessional = "883110000015376",
                 countryOfVaccination = "GE",
-                nextVaccinationDate = Date(vaccination.dateOfVaccination.time + sixMonth),
+                nextVaccinationDate = vaccination.dateOfVaccination.toZonedDateTime().plusMonths(6)
+                    .toIsoInstantString(),
                 recipient = Recipient(
                     birthDate = patient.birthDate,
                     familyName = patient.name,
                     givenName = patient.givenName,
                     gender = patient.gender.name
                 ).apply {
-                    id = URI.create(message.holderKey)
+                    id = message.holderKey.toString()
                 },
                 vaccine = Vaccine(
                     atcCode = vaccination.atcCode,
@@ -190,7 +191,12 @@ object Controller {
                     UUID.randomUUID().toString(),
                     Credential(
                         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
-                        type = Credential.DEFAULT_JSONLD_TYPES + "InsuranceCertificate"
+                        type = Credential.DEFAULT_JSONLD_TYPES + "InsuranceCertificate",
+                        credentialSubject = JsonObject(
+                            mapOf(
+                                "type" to JsonArray(listOf(JsonPrimitive("Insurance"))),
+                            )
+                        )
                     )
                 )
             )
@@ -218,15 +224,15 @@ object Controller {
                 Patient(
                     name = insurance.insurant.familyName,
                     givenName = insurance.insurant.givenName,
-                    birthDate = insurance.insurant.birthDate,
+                    birthDate = insurance.insurant.birthDate ?: "---",
                     gender = insurance.insurant.gender,
                     insurance = insurance,
-                    insuranceLastStatusCheck = Date()
+                    insuranceLastStatusCheck = ZonedDateTime.now().toIsoInstantString()
                 )
             )
         } else { // update existing patient{
             patient.insurance = insurance
-            patient.insuranceLastStatusCheck = Date()
+            patient.insuranceLastStatusCheck = ZonedDateTime.now().toIsoInstantString()
         }
 
         // inform the browser to update the patient page

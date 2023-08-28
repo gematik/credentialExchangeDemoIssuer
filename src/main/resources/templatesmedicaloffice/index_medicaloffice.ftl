@@ -15,11 +15,11 @@
                 <#assign x++>
                 <tr <#if  x%2 = 0>style="background-color: lightcyan"</#if> >
                     <td><a href="/medicaloffice/${customer.id}">${customer.givenName} ${customer.name}</a></td>
-                    <td>${customer.birthDate?date}</td>
+                    <td>${customer.birthDate?date("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <td>${customer.gender}</td>
                     <td><#if customer.email??><a href="mailto:${customer.email}">${customer.email}</a></#if></td>
                     <#if customer.insuranceLastStatusCheck??>
-                        <td>${customer.insuranceLastStatusCheck?datetime}</td>
+                        <td>${customer.insuranceLastStatusCheck?datetime("yyyy-MM-dd'T'hh:mm:ssX")}</td>
                     <#else>
                         <td style="color:red">no insurance data</td>
                     </#if>
