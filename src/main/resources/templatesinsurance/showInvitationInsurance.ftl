@@ -4,7 +4,7 @@
     <title>Check In</title>
 </head>
 <body style="text-align: center; font-family: sans-serif">
-<img src="/static/Krankenhaus_Blau_gematik.svg" alt="medical office" width="100">
+<img src="/static/Krankenkasse_Blau_gematik.svg" alt="insurance company" width="100">
 <h3>
     Welcome ${invitation.givenName} ${invitation.name}.
 </h3>

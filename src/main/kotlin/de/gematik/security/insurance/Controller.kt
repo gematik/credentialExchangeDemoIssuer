@@ -8,7 +8,6 @@ import de.gematik.security.credentialIssuer
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
@@ -43,11 +42,10 @@ object Controller {
 
     suspend fun handleIncomingMessage(protocolInstance: CredentialExchangeIssuerProtocol, message: LdObject): Boolean {
 
-        val type = message.type ?: return true //ignore
         return when {
-            type.contains("Close") -> false // close connection
-            type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
-            type.contains("CredentialRequest") -> handleCredentialRequest(
+            message.type.contains("Close") -> false // close connection
+            message.type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
+            message.type.contains("CredentialRequest") -> handleCredentialRequest(
                 protocolInstance,
                 message as CredentialRequest
             )
@@ -66,7 +64,7 @@ object Controller {
                 outputDescriptor = Descriptor(
                     UUID.randomUUID().toString(), Credential(
                         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
-                        type = Credential.DEFAULT_JSONLD_TYPES + "InsuranceCertificate"
+                        type = listOf("InsuranceCertificate")
                     )
                 )
             )
@@ -78,9 +76,14 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
+        if(!message.outputDescriptor.frame.type.contains("InsuranceCertificate")) return false
         val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
-        val insurant = customers.find { it.invitation.id == invitationId } ?: return false
-        val verifiableCredential = getInsurance(insurant, message.holderKey.toString())?.let {
+        val customer = customers.find { it.invitation.id == invitationId } ?: return false
+        val verifiableCredential = customer.insurance?. apply {
+            id = message.holderKey.toString()
+        }?.let{
+            json.encodeToJsonElement(it).jsonObject
+        }?.let {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("InsuranceCertificate"),
@@ -106,12 +109,6 @@ object Controller {
             )
         )
         return false
-    }
-
-    private fun getInsurance(customer: Customer, holderId: String): JsonObject? {
-        val insurance = customer.insurance ?: return null
-        return json.encodeToJsonElement(insurance.apply { id = holderId }
-        ).jsonObject
     }
 
 }

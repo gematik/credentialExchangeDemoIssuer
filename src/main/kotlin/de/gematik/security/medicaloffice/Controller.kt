@@ -94,7 +94,7 @@ object Controller {
                 outputDescriptor = Descriptor(
                     UUID.randomUUID().toString(), Credential(
                         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://w3id.org/vaccination/v1"),
-                        type = Credential.DEFAULT_JSONLD_TYPES + "VaccinationCertificate"
+                        type = listOf("VaccinationCertificate")
                     )
                 )
             )
@@ -106,6 +106,7 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
+        if(!message.outputDescriptor.frame.type.contains("VaccinationCertificate")) return false
         val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
         val patient =
             patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null } ?: return false
@@ -191,12 +192,7 @@ object Controller {
                     UUID.randomUUID().toString(),
                     Credential(
                         atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
-                        type = Credential.DEFAULT_JSONLD_TYPES + "InsuranceCertificate",
-                        credentialSubject = JsonObject(
-                            mapOf(
-                                "type" to JsonArray(listOf(JsonPrimitive("Insurance"))),
-                            )
-                        )
+                        type = listOf("InsuranceCertificate"),
                     )
                 )
             )
