@@ -82,7 +82,7 @@ object Controller {
         val verifiableCredential = customer.insurance?. apply {
             id = message.holderKey.toString()
         }?.let{
-            json.encodeToJsonElement(it).jsonObject
+            JsonLdObject(json.encodeToJsonElement(it).jsonObject.toMap())
         }?.let {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://gematik.de/vsd/v1")),

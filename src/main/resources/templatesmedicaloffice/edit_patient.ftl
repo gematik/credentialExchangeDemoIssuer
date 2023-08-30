@@ -25,10 +25,6 @@
             <p>
                 <input type="submit" name="_action" value="update">
             </p>
-        </form>
-    </div>
-    <div>
-        <form action="/medicaloffice/${customer.id}" method="post">
             <p>
                 <input type="submit" name="_action" value="delete">
             </p>

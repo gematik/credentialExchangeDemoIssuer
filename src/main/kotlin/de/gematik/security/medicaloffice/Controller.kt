@@ -8,6 +8,7 @@ import de.gematik.security.credentialExchangeLib.credentialSubjects.VaccinationE
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Vaccine
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
+import de.gematik.security.credentialExchangeLib.extensions.toObject
 import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
@@ -71,11 +72,10 @@ object Controller {
 
     suspend fun handleIncomingMessage(protocolInstance: CredentialExchangeIssuerProtocol): Boolean {
         val message = protocolInstance.receive()
-        val type = message.type ?: return true //ignore
         return when {
-            type.contains("Close") -> false // close connection
-            type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
-            type.contains("CredentialRequest") -> handleCredentialRequest(
+            message.type.contains("Close") -> false // close connection
+            message.type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
+            message.type.contains("CredentialRequest") -> handleCredentialRequest(
                 protocolInstance,
                 message as CredentialRequest
             )
@@ -106,7 +106,7 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
-        if(!message.outputDescriptor.frame.type.contains("VaccinationCertificate")) return false
+        if (!message.outputDescriptor.frame.type.contains("VaccinationCertificate")) return false
         val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
         val patient =
             patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null } ?: return false
@@ -115,7 +115,7 @@ object Controller {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
                 type = Credential.DEFAULT_JSONLD_TYPES + listOf("VaccinationCertificate"),
-                credentialSubject = it,
+                credentialSubject = JsonLdObject(it.toMap()),
                 issuanceDate = ZonedDateTime.now(),
                 issuer = credentialIssuer.didKey
             ).apply {
@@ -170,10 +170,9 @@ object Controller {
     // check in by verifing insurance credential
     suspend fun handleIncomingMessage(protocolInstance: PresentationExchangeVerifierProtocol): Boolean {
         val message = protocolInstance.receive()
-        val type = message.type ?: return true //ignore
         return when {
-            type.contains("Close") -> false // close connection
-            type.contains("PresentationSubmit") -> handlePresentationSubmit(
+            message.type.contains("Close") -> false // close connection
+            message.type.contains("PresentationSubmit") -> handlePresentationSubmit(
                 protocolInstance,
                 message as PresentationSubmit
             )
@@ -204,9 +203,16 @@ object Controller {
         protocolInstance: PresentationExchangeVerifierProtocol,
         presentationSubmit: PresentationSubmit
     ): Boolean {
-        if (!presentationSubmit.presentation.verifiableCredential.get(0).type.contains("InsuranceCertificate")) return false
+        if (!presentationSubmit.presentation.verifiableCredential.get(0).type.contains("InsuranceCertificate")) {
+            logger.info { "invalid credential subject type: ${presentationSubmit.presentation.verifiableCredential.get(0).type} but \"InsuranceCertificate\" was expected" }
+            return false
+        }
         val insurance =
-            json.decodeFromJsonElement<Insurance>(presentationSubmit.presentation.verifiableCredential.get(0).credentialSubject!!.jsonObject)
+            presentationSubmit.presentation.verifiableCredential.get(0).credentialSubject?.toObject<Insurance>()
+                ?: run {
+                    logger.info { "invalid credential subject" }
+                    return false
+                }
         val patient = patients.find {
             it?.insurance?.insurant?.insurantId == insurance.insurant.insurantId
         } ?: patients.find {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Check In</title>
+    <title>Invitation Insurance Credential</title>
 </head>
 <body style="text-align: center; font-family: sans-serif">
 <img src="/static/Krankenkasse_Blau_gematik.svg" alt="insurance company" width="100">
