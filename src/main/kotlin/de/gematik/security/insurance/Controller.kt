@@ -1,7 +1,8 @@
 package de.gematik.security.insurance
 
-import de.gematik.security.credentialExchangeLib.connection.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.createUri
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
@@ -26,12 +27,13 @@ object Controller {
     var lastCallingRemoteAddress: String? = null
 
     fun start(wait: Boolean = false) {
-        CredentialExchangeIssuerProtocol.listen(WsConnection, host = "0.0.0.0", port = port) {
-            lastCallingRemoteAddress =
-                ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
-            while (true) {
-                val message = it.receive()
-                if (!handleIncomingMessage(it, message)) break
+        CredentialExchangeIssuerProtocol.listen(WsConnection, createUri("0.0.0.0", port = port)) {
+            lastCallingRemoteAddress = ((it.connection as WsConnection).session as DefaultWebSocketServerSession).call.request.local.remoteAddress
+            if (handleInvitation(it)) {
+                while (true) {
+                    val message = it.receive()
+                    if (!handleIncomingMessage(it, message)) break
+                }
             }
         }
         embeddedServer(Netty, host = "0.0.0.0", port = 8080) {
@@ -44,7 +46,6 @@ object Controller {
 
         return when {
             message.type.contains("Close") -> false // close connection
-            message.type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
             message.type.contains("CredentialRequest") -> handleCredentialRequest(
                 protocolInstance,
                 message as CredentialRequest
@@ -55,8 +56,7 @@ object Controller {
     }
 
     private suspend fun handleInvitation(
-        protocolInstance: CredentialExchangeIssuerProtocol,
-        message: Invitation
+        protocolInstance: CredentialExchangeIssuerProtocol
     ): Boolean {
         protocolInstance.sendOffer(
             CredentialOffer(
@@ -76,12 +76,12 @@ object Controller {
         protocolInstance: CredentialExchangeIssuerProtocol,
         message: CredentialRequest
     ): Boolean {
-        if(!message.outputDescriptor.frame.type.contains("InsuranceCertificate")) return false
-        val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
-        val customer = customers.find { it.invitation.id == invitationId } ?: return false
-        val verifiableCredential = customer.insurance?. apply {
+        if (!message.outputDescriptor.frame.type.contains("InsuranceCertificate")) return false
+        val invitationId = protocolInstance.protocolState.invitationId ?: return false
+        val customer = customers.find { it.invitation.id == invitationId.toString() } ?: return false
+        val verifiableCredential = customer.insurance?.apply {
             id = message.holderKey.toString()
-        }?.let{
+        }?.let {
             JsonLdObject(json.encodeToJsonElement(it).jsonObject.toMap())
         }?.let {
             Credential(

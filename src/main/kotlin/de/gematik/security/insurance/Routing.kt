@@ -15,6 +15,7 @@ import io.ktor.server.util.*
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 fun Application.configureRouting() {
@@ -51,7 +52,8 @@ fun Application.configureRouting() {
                         .atZone(ZoneId.of("UTC"))
                         .toIsoInstantString(),
                     if (gender.isBlank()) Gender.Undefined else Gender.valueOf(gender),
-                    email
+                    email,
+                    invitationId = UUID.randomUUID()
                 )
                 customers.add(newEntry)
                 call.respondRedirect("/insurance/${newEntry.id}")

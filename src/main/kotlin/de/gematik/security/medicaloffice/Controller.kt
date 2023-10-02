@@ -1,22 +1,26 @@
 package de.gematik.security.medicaloffice
 
-import de.gematik.security.credentialExchangeLib.connection.MessageType
-import de.gematik.security.credentialExchangeLib.connection.WsConnection
+import de.gematik.security.credentialExchangeLib.connection.Invitation
+import de.gematik.security.credentialExchangeLib.connection.websocket.WsConnection
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Insurance
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Recipient
 import de.gematik.security.credentialExchangeLib.credentialSubjects.VaccinationEvent
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Vaccine
 import de.gematik.security.credentialExchangeLib.crypto.ProofType
+import de.gematik.security.credentialExchangeLib.extensions.createUri
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.extensions.toObject
 import de.gematik.security.credentialExchangeLib.extensions.toZonedDateTime
 import de.gematik.security.credentialExchangeLib.json
 import de.gematik.security.credentialExchangeLib.protocols.*
 import de.gematik.security.credentialIssuer
+import de.gematik.security.hostName
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 import mu.KotlinLogging
 import java.net.URI
 import java.time.ZonedDateTime
@@ -32,27 +36,32 @@ object Controller {
 
     var lastCallingRemoteAddress: String? = null
 
+    val invitation = Invitation(
+        id = UUID.randomUUID().toString(),
+        label = "Praxis Sommergarten",
+        goal = "Check In",
+        goalCode = GoalCode.REQUEST_PRESENTATION,
+        from = URI("ws://$hostName:${port}")
+    )
+
     fun start(wait: Boolean = false) {
-        WsConnection.listen(host = "0.0.0.0", port = port) {
+        WsConnection.listen(createUri("0.0.0.0", port = port)) {
             while (true) {
                 lastCallingRemoteAddress =
                     (it.session as DefaultWebSocketServerSession).call.request.local.remoteAddress
-                val message = it.receive()
-                if (message.type == MessageType.CLOSE) break
-                if (!(message.type == MessageType.INVITATION_ACCEPT)) continue
-                val invitation = json.decodeFromJsonElement<Invitation>(message.content)
-                if (invitation.goalCode == GoalCode.REQUEST_PRESENTATION) {
-                    PresentationExchangeVerifierProtocol.bind(it, invitation) {
+                if (it.invitationId.toString() == invitation.id) { // Check in
+                    PresentationExchangeVerifierProtocol.bind(it) {
                         // request insurance credential
-                        if (handleInvitation(it, invitation)) {
+                        if (handleInvitation(it)) {
                             while (true) {
                                 if (!handleIncomingMessage(it)) break
                             }
                         }
                     }
-                } else {
-                    CredentialExchangeIssuerProtocol.bind(it, invitation) {
-                        if (handleInvitation(it, invitation)) {
+                } else { // issue vaccination credential
+                    CredentialExchangeIssuerProtocol.bind(it) {
+                        // offer vacination credential
+                        if (handleInvitation(it)) {
                             while (true) {
                                 if (!handleIncomingMessage(it)) break
                             }
@@ -68,13 +77,12 @@ object Controller {
         }.start(wait)
     }
 
-    // issue credential
+// issue credential
 
     suspend fun handleIncomingMessage(protocolInstance: CredentialExchangeIssuerProtocol): Boolean {
         val message = protocolInstance.receive()
         return when {
             message.type.contains("Close") -> false // close connection
-            message.type.contains("Invitation") -> handleInvitation(protocolInstance, message as Invitation)
             message.type.contains("CredentialRequest") -> handleCredentialRequest(
                 protocolInstance,
                 message as CredentialRequest
@@ -85,8 +93,7 @@ object Controller {
     }
 
     private suspend fun handleInvitation(
-        protocolInstance: CredentialExchangeIssuerProtocol,
-        message: Invitation
+        protocolInstance: CredentialExchangeIssuerProtocol
     ): Boolean {
         protocolInstance.sendOffer(
             CredentialOffer(
@@ -107,10 +114,12 @@ object Controller {
         message: CredentialRequest
     ): Boolean {
         if (!message.outputDescriptor.frame.type.contains("VaccinationCertificate")) return false
-        val invitationId = protocolInstance.protocolState.invitation?.id ?: return false
+        val invitationId = protocolInstance.protocolState.invitationId ?: return false
         val patient =
-            patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId } != null } ?: return false
-        val vaccination = patient.vaccinations.firstOrNull { it.invitation.id == invitationId } ?: return false
+            patients.find { it.vaccinations.firstOrNull() { it.invitation.id == invitationId.toString() } != null }
+                ?: return false
+        val vaccination =
+            patient.vaccinations.firstOrNull { it.invitation.id == invitationId.toString() } ?: return false
         val verifiableCredential = getVaccination(patient, vaccination, message).let {
             Credential(
                 atContext = Credential.DEFAULT_JSONLD_CONTEXTS + listOf(URI.create("https://w3id.org/vaccination/v1")),
@@ -182,8 +191,7 @@ object Controller {
     }
 
     suspend fun handleInvitation(
-        protocolInstance: PresentationExchangeVerifierProtocol,
-        invitation: Invitation
+        protocolInstance: PresentationExchangeVerifierProtocol
     ): Boolean {
         protocolInstance.requestPresentation(
             PresentationRequest(

@@ -1,12 +1,11 @@
 package de.gematik.security.insurance
 
 import de.gematik.security.PreferredContact
+import de.gematik.security.credentialExchangeLib.connection.Invitation
 import de.gematik.security.credentialExchangeLib.credentialSubjects.*
 import de.gematik.security.credentialExchangeLib.extensions.getZonedDate
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
-import de.gematik.security.credentialExchangeLib.protocols.Invitation
-import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.hostName
 import java.net.URI
 import java.util.*
@@ -21,19 +20,16 @@ data class Customer(
     var email: String? = null,
     var preferredContact: PreferredContact = PreferredContact.unknown,
     var insurance: Insurance? = null,
-    val invitation: Invitation = Invitation(
-        UUID.randomUUID().toString(),
+    val invitationId: UUID
+) {
+    val id = idCounter.getAndIncrement()
+    val invitation = Invitation(
+        id = invitationId.toString(),
         label = "Health Insurance North",
         goal = "Issue Insurance Certificates",
         goalCode = GoalCode.OFFER_CREDENDIAL,
-        service = listOf(
-            Service(
-                serviceEndpoint = URI("ws://$hostName:${Controller.port}")
-            )
-        )
+        from = URI("ws://$hostName:${Controller.port}")
     )
-) {
-    val id = idCounter.getAndIncrement()
 
     companion object {
         private val idCounter = AtomicInteger()
@@ -110,7 +106,8 @@ val customers = Collections.synchronizedList(
                         dormancyType = DormancyType.complete
                     )
                 )
-            )
+            ),
+            invitationId = UUID.fromString("ede563a1-215c-45c2-9afb-1c3d36245cf4")
         ),
         Customer(
             "Mustermann",
@@ -139,15 +136,16 @@ val customers = Collections.synchronizedList(
                     insuranceType = InsuranceType.Member,
                     costCenter = costCenter
                 )
-            )
-
+            ),
+            invitationId = UUID.fromString("083d2a47-1d96-40bf-83ad-bec0aa04710d")
         ),
         Customer(
             "Doe",
             "John",
             birthDate = getZonedDate(1935, 6, 22).toIsoInstantString(),
             email = "john.doe@aol.com",
-            gender = Gender.Male
+            gender = Gender.Male,
+            invitationId = UUID.fromString("39127d73-2bca-44e3-af84-1deb1d6ed234")
         ),
         Customer(
             "Roe",
@@ -177,7 +175,8 @@ val customers = Collections.synchronizedList(
                     costCenter = costCenter,
                     dmpMark = DmpMark.ChronicCardiacInsufficiency,
                 )
-            )
+            ),
+            invitationId = UUID.fromString("e123cdb3-5a0d-4164-9f7b-072442ee67db")
         )
     )
 )

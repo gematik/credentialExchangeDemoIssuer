@@ -3,7 +3,7 @@ package de.gematik.security
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.qrcode.QRCodeWriter
-import de.gematik.security.credentialExchangeLib.protocols.Invitation
+import de.gematik.security.credentialExchangeLib.connection.Invitation
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,7 +22,7 @@ fun Date.toDateString() = sdfDate.format(this)
 fun String.toDateTimeUtc() = sdfDateTimeUtc.parse(this)
 fun Date.toDateTimeUtcString() = sdfDateTimeUtc.format(this)
 
-val  Invitation.url : String
+val Invitation.url : String
     get() = "https://my-wallet.me/ssi?oob=${this.toBase64()}"
 
 val Invitation.qrCode : String

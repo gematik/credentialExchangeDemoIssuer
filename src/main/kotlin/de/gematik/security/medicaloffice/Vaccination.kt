@@ -1,9 +1,8 @@
 package de.gematik.security.medicaloffice
 
+import de.gematik.security.credentialExchangeLib.connection.Invitation
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.protocols.GoalCode
-import de.gematik.security.credentialExchangeLib.protocols.Invitation
-import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.hostName
 import kotlinx.serialization.Serializable
 import java.net.URI
@@ -11,7 +10,11 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Serializable
-data class VaccineDetails(val medicalProductName: String, val marketingAuthorizationHolder: String, val note: String? = null)
+data class VaccineDetails(
+    val medicalProductName: String,
+    val marketingAuthorizationHolder: String,
+    val note: String? = null
+)
 
 @Serializable
 enum class AuthorizedVaccine(val details: VaccineDetails) {
@@ -80,14 +83,10 @@ data class Vaccination(
     val batchNumber: String,
     val order: Int,
     val invitation: Invitation = Invitation(
-        UUID.randomUUID().toString(),
+        id = UUID.randomUUID().toString(),
         label = "Praxis Sommergarten",
         goal = "Issue Vaccination Certificate",
         goalCode = GoalCode.OFFER_CREDENDIAL,
-        service = listOf(
-            Service(
-                serviceEndpoint = URI("ws://$hostName:${de.gematik.security.medicaloffice.Controller.port}")
-            )
-        )
+        from = URI("ws://$hostName:${de.gematik.security.medicaloffice.Controller.port}")
     )
 )

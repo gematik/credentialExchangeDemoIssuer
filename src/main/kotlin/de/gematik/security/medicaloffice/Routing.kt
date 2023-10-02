@@ -3,9 +3,6 @@ package de.gematik.security.medicaloffice
 import de.gematik.security.credentialExchangeLib.credentialSubjects.Gender
 import de.gematik.security.credentialExchangeLib.extensions.toIsoInstantString
 import de.gematik.security.credentialExchangeLib.json
-import de.gematik.security.credentialExchangeLib.protocols.GoalCode
-import de.gematik.security.credentialExchangeLib.protocols.Invitation
-import de.gematik.security.credentialExchangeLib.protocols.Service
 import de.gematik.security.hostName
 import de.gematik.security.qrCode
 import de.gematik.security.url
@@ -18,12 +15,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import kotlinx.serialization.encodeToString
-import java.net.URI
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 fun Application.configureRouting() {
@@ -159,17 +154,7 @@ fun Application.configureRouting() {
                     FreeMarkerContent(
                         "showInvitationCheckIn.ftl", mapOf(
                             "invitation" to object {
-                                private val invitation = Invitation(
-                                    id = UUID.randomUUID().toString(),
-                                    label = "Praxis Sommergarten",
-                                    goal = "Check In",
-                                    goalCode = GoalCode.REQUEST_PRESENTATION,
-                                    service = listOf(
-                                        Service(
-                                            serviceEndpoint = URI("ws://$hostName:${Controller.port}")
-                                        )
-                                    )
-                                )
+                                private val invitation = Controller.invitation
                                 val url = invitation.url
                                 val qrCode = invitation.qrCode
                             }
