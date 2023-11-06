@@ -128,7 +128,10 @@ val customers = Collections.synchronizedList(
                         "Max und Moritz Strasse",
                         "13a",
                         "GER"
-                    )
+                    ),
+                    portrait = object {}.javaClass.getResourceAsStream("/files/erika-mustermann.jpg")?.readBytes()?.let {
+                        Base64.getEncoder().encodeToString(it)
+                    }
                 ),
                 coverage = Coverage(
                     start = getZonedDate(2007, 1, 1).toIsoInstantString(),

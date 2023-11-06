@@ -31,6 +31,10 @@
             <h4>
                 Insurant
             </h4>
+            <#if customer.insurance.insurant.portrait??>
+                <img src="data:image/png;base64,${customer.insurance.insurant.portrait}" alt="Portrait" width="100"
+                     height="128"/>
+            </#if>
             <table class="center">
                 <tr style="background-color: lightcyan; font-size: xx-small">
                     <th>insurant id</th>

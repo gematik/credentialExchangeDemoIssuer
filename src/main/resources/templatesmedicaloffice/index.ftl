@@ -35,7 +35,7 @@
         </td>
     </tr>
     <tr>
-        <td colspan="5">Issue Credential / Presentation Exchange over Websockets (HTTP)</td>
+        <td colspan="5">Issue Credential / Presentation Exchange</td>
     </tr>
     <tr>
         <td></td>
