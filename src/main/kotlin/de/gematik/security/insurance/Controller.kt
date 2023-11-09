@@ -80,7 +80,7 @@ object Controller {
         val invitationId = protocolInstance.protocolState.invitationId ?: return false
         val customer = customers.find { it.invitation.id == invitationId.toString() } ?: return false
         val verifiableCredential = customer.insurance?.apply {
-            id = message.holderKey.toString()
+            insurant.id = message.holderKey.toString()
         }?.let {
             JsonLdObject(json.encodeToJsonElement(it).jsonObject.toMap())
         }?.let {

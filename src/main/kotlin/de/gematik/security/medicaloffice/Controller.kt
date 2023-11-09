@@ -195,11 +195,13 @@ object Controller {
     ): Boolean {
         protocolInstance.requestPresentation(
             PresentationRequest(
-                inputDescriptor = Descriptor(
-                    UUID.randomUUID().toString(),
-                    Credential(
-                        atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
-                        type = listOf("InsuranceCertificate"),
+                inputDescriptor = listOf(
+                    Descriptor(
+                        UUID.randomUUID().toString(),
+                        Credential(
+                            atContext = Credential.DEFAULT_JSONLD_CONTEXTS + URI("https://gematik.de/vsd/v1"),
+                            type = listOf("InsuranceCertificate"),
+                        )
                     )
                 )
             )
