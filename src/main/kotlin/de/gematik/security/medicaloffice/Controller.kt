@@ -37,7 +37,7 @@ object Controller {
     var lastCallingRemoteAddress: String? = null
 
     val invitation = Invitation(
-        id = UUID.randomUUID().toString(),
+        id = "29fe2783-2a48-4cd3-8c8d-821764d6c463",
         label = "Praxis Sommergarten",
         goal = "Check In",
         goalCode = GoalCode.REQUEST_PRESENTATION,
