@@ -19,7 +19,7 @@
                     <td>${customer.gender}</td>
                     <td><#if customer.email??><a href="mailto:${customer.email}">${customer.email}</a></#if></td>
                     <#if customer.insuranceLastStatusCheck??>
-                        <td>${customer.insuranceLastStatusCheck?datetime("yyyy-MM-dd'T'hh:mm:ssX")}</td>
+                        <td>${customer.insuranceLastStatusCheck?datetime("yyyy-MM-dd'T'HH:mm:ssX")}</td>
                     <#else>
                         <td style="color:red">no insurance data</td>
                     </#if>
