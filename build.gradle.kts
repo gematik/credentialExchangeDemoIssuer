@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+    implementation(fileTree("libs") { include("*.jar") })
     implementation("de.gematik:credentialExchangeLib:0.3.0-SNAPSHOT")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
