@@ -20,6 +20,7 @@ application {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://maven.scijava.org/content/repositories/public/")
 }
 
 dependencies {
@@ -40,4 +41,8 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+}
+
+kotlin {
+    jvmToolchain(11)
 }

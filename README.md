@@ -1,3 +1,42 @@
+<img align="right" width="250" height="47" src="Gematik_Logo_Flag_With_Background.png"/> <br/> 
+
+# Credential Exchange Demo Issuer
+
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+	</li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
+
+## About The Project
+Demo Credential Issuer for eHealth use cases based on credential exchange lib - Insurance Company and Medical Office.
+This Work ist part of a discontinued collaboration within [IDUnion project](https://idunion.org/projekt/?lang=en)
+
+## Getting Started
+### Prerequisites
+Operating system dependant BBS signature shared library, e.g.  `lib/windows/bbs.dll` needs to be extracted from `libs/bbs.signatures-1.6-SNAPSHOT.jar` to a path where (e.g. somewhere in directories listed in`%PATH%` on windows, project root folder will do fine for `gradle run`) jvm can pick it up.
+Also [credentialExchangeLib](https://github.com/gematik/poc-fue-credentialExchangeLib) needs to be installed to MavenLocal.
+
+## Usage
+Use gradle to build and `run` to start embedded webserver and navigate your browser to port http://liocalhost:8080.
+
+When using distribution zip/jar, make sure to extract bbs shared library as mentioned under [Prerequisites](#prerequisites)
+
+## Contributing
+This project is part of a proof of concept which is no longer being maintained.
+
 ## License
 
 EUROPEAN UNION PUBLIC LICENCE v. 1.2
